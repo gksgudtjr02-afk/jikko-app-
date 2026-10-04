@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>찍꼬 파트너 – 기사님 전용</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#EEF0F3; --surface:#FFFFFF; --ink:#16181C; --muted:#6B717A; --line:#E1E4E8; --chip:#F3F4F6;
+  --brand:#17191D; --brand-2:#23262C; --on-brand:#F5F3EF; --on-brand-muted:#A3A8B0;
+  --orange:#FF6B00; --orange-2:#FF8A2B; --orange-soft:#FFF0E5; --orange-line:#FFC9A1;
+  --ok:#15895A; --ok-2:#1FA56E; --ok-soft:#E3F5EC; --warn:#D9381E; --warn-soft:#FDE7E2;
+  --shadow:0 1px 2px rgba(20,22,26,.06),0 6px 20px rgba(20,22,26,.06);
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#0E1012; --surface:#1A1D21; --ink:#F2F0EC; --muted:#9AA0A8; --line:#2C3036; --chip:#22262B;
+    --orange-soft:#2E1C10; --orange-line:#6A3A16; --ok-soft:#10291E; --warn-soft:#331610;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --page:#0E1012; --surface:#1A1D21; --ink:#F2F0EC; --muted:#9AA0A8; --line:#2C3036; --chip:#22262B;
+  --orange-soft:#2E1C10; --orange-line:#6A3A16; --ok-soft:#10291E; --warn-soft:#331610;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:var(--page);color:var(--ink);font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer;border:none;background:none}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+svg.i{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.app{max-width:460px;margin:0 auto;min-height:100%}
+.num{font-family:"Outfit",sans-serif;font-weight:800;letter-spacing:-0.02em}
+
+.mark{display:inline-flex;align-items:center;gap:8px;font-family:"Outfit",sans-serif;font-weight:800;letter-spacing:-0.02em;line-height:1}
+.mark .en{font-size:22px}
+.mark .lens{display:inline-block;width:.78em;height:.78em;border-radius:50%;border:.16em solid var(--orange);position:relative;top:.02em;margin-left:.04em}
+.mark .lens::after{content:"";position:absolute;width:.18em;height:.18em;border-radius:50%;background:var(--orange);top:-.28em;right:-.28em}
+.mark .tag{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;font-size:12px;color:#fff;background:var(--orange);padding:3px 8px;border-radius:999px;letter-spacing:0}
+
+.top{display:flex;align-items:center;gap:10px;padding:12px 16px 8px}
+.top .back{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow)}
+.top .title{font-weight:700;font-size:16px;flex:1}
+.top .count{font-size:13px;font-weight:600;color:var(--muted)}
+.progress{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:2px 16px 10px}
+.progress span{height:4px;border-radius:2px;background:var(--line)}
+.progress span.on{background:var(--orange)}
+
+main{padding:0 16px 150px}
+.screen{display:none}
+.screen.on{display:block;animation:in .28s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+@media (prefers-reduced-motion: reduce){.screen.on,.sheet,.call{animation:none!important}}
+h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacing:-0.03em}
+.lead{color:var(--muted);margin:0 0 18px;font-size:15px}
+
+/* intro */
+#s-intro{margin:0 -16px}
+.hero{background:radial-gradient(120% 70% at 90% 0%,#2C2218 0%,transparent 60%),linear-gradient(180deg,var(--brand-2),var(--brand));color:var(--on-brand);padding:18px 20px 28px;border-radius:0 0 30px 30px}
+.hero h1{font-size:30px;line-height:1.3;margin:30px 0 10px;font-weight:700;letter-spacing:-0.04em}
+.hero p{color:var(--on-brand-muted);margin:0 0 20px;font-size:15px}
+.ticketprev{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:14px;font-size:14px}
+.ticketprev .row{display:flex;justify-content:space-between;padding:5px 0;color:var(--on-brand-muted)}
+.ticketprev .row b{color:var(--on-brand);font-weight:600}
+.ticketprev .row b.o{color:var(--orange-2)}
+.section{padding:22px 16px 0}
+.section h3{font-size:17px;margin:0 0 12px}
+.why{display:grid;gap:10px}
+.why div{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.why .ic{width:42px;height:42px;border-radius:13px;background:var(--orange-soft);color:var(--orange);display:grid;place-items:center;flex:none}
+.why b{display:block;font-size:15.5px}
+.why small{color:var(--muted);font-size:13.5px;line-height:1.5;display:block;margin-top:2px}
+.fee{margin-top:12px;background:var(--surface);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.fee .r{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.fee .r:last-child{border-bottom:0}
+.fee .r span{color:var(--muted)}
+
+/* forms */
+.field{margin-bottom:16px}
+.field > label,.field > .lab{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.field small.help{display:block;color:var(--muted);font-size:12.5px;margin-top:6px}
+.inp{width:100%;min-height:52px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);padding:0 14px;font-size:16px}
+.inp:focus{outline:none;border-color:var(--orange)}
+.inrow{display:flex;gap:8px}
+.inrow .inp{flex:1}
+.sbtn{flex:none;min-height:52px;padding:0 14px;border-radius:14px;background:var(--brand);color:var(--on-brand);font-weight:600;font-size:14.5px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--chip);border-radius:14px;padding:4px;gap:4px}
+.seg button{min-height:46px;border-radius:11px;font-weight:600;font-size:15px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 14px;font-size:14.5px;font-weight:500}
+.chip[aria-pressed="true"]{border-color:var(--orange);background:var(--orange-soft);color:var(--orange);font-weight:600}
+.upl{display:flex;gap:12px;align-items:center;background:var(--surface);border:1.5px dashed var(--line);border-radius:16px;padding:14px;cursor:pointer;width:100%;text-align:left}
+.upl .ic{width:42px;height:42px;border-radius:12px;background:var(--chip);display:grid;place-items:center;color:var(--muted);flex:none}
+.upl b{display:block;font-size:15px}
+.upl small{color:var(--muted);font-size:13px}
+.upl.done{border-style:solid;border-color:var(--ok)}
+.upl.done .ic{background:var(--ok);color:#fff}
+.upl input{position:absolute;width:1px;height:1px;opacity:0}
+.notice{background:var(--orange-soft);color:var(--ink);border-radius:14px;padding:12px 14px;font-size:13.5px;margin-bottom:16px}
+.notice b{color:var(--orange)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;padding:12px 0;cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--orange);flex:none;margin:1px 0 0}
+
+/* review */
+.big-ic{width:84px;height:84px;border-radius:26px;background:var(--orange-soft);color:var(--orange);display:grid;place-items:center;margin:34px auto 16px}
+.big-ic svg{width:40px;height:40px}
+.center{text-align:center}
+.vsteps{list-style:none;padding:0;margin:20px 0;background:var(--surface);border-radius:18px;padding:6px 16px;box-shadow:var(--shadow)}
+.vsteps li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
+.vsteps li:last-child{border-bottom:0}
+.vsteps .dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--chip);color:var(--muted);font-size:12px;font-weight:700}
+.vsteps li.done .dot{background:var(--ok);color:#fff}
+.vsteps li.now .dot{background:var(--orange);color:#fff}
+.vsteps small{display:block;color:var(--muted);font-size:13px}
+
+/* home */
+#s-home{margin:0 -16px}
+.homehd{background:linear-gradient(180deg,var(--brand-2),var(--brand));color:var(--on-brand);padding:16px 20px 24px;border-radius:0 0 30px 30px}
+.homehd .hi{margin:22px 0 16px;font-size:15px;color:var(--on-brand-muted)}
+.homehd .hi b{display:block;color:var(--on-brand);font-size:22px;letter-spacing:-0.03em}
+.online{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border-radius:22px;padding:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--on-brand);transition:background .2s}
+.online .sw{width:58px;height:34px;border-radius:999px;background:#3A3F46;position:relative;flex:none;transition:background .2s}
+.online .sw::after{content:"";position:absolute;top:4px;left:4px;width:26px;height:26px;border-radius:50%;background:#fff;transition:transform .2s}
+.online[aria-pressed="true"]{background:rgba(31,165,110,.16);border-color:rgba(31,165,110,.5)}
+.online[aria-pressed="true"] .sw{background:var(--ok-2)}
+.online[aria-pressed="true"] .sw::after{transform:translateX(24px)}
+.online b{display:block;font-size:17px}
+.online small{color:var(--on-brand-muted);font-size:13px}
+.pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok-2);margin-right:6px;animation:blink 1s infinite alternate}
+@keyframes blink{to{opacity:.25}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stats div{background:rgba(255,255,255,.05);border-radius:16px;padding:12px;text-align:center}
+.stats .num{font-size:20px;display:block;color:var(--on-brand)}
+.stats small{color:var(--on-brand-muted);font-size:12px}
+.paycard{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border-radius:20px;padding:16px;box-shadow:var(--shadow);width:100%;text-align:left}
+.paycard small{color:var(--muted);font-size:13px;display:block}
+.paycard .num{font-size:26px}
+.paycard .go{display:flex;align-items:center;gap:4px;color:var(--orange);font-weight:600;font-size:14px}
+.testbtn{display:block;width:100%;text-align:center;color:var(--muted);font-size:14px;font-weight:600;padding:14px;text-decoration:underline;text-underline-offset:4px}
+.hist{background:var(--surface);border-radius:20px;padding:4px 16px;box-shadow:var(--shadow)}
+.hist .r{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
+.hist .r:last-child{border-bottom:0}
+.hist b{font-size:15px;display:block}
+.hist small{color:var(--muted);font-size:13px}
+.hist .amt{text-align:right;font-weight:700}
+.hist .amt small{display:block;font-weight:500}
+.new-tag{font-size:11px;font-weight:700;color:#fff;background:var(--orange);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+
+/* incoming call overlay */
+.call{position:fixed;inset:0;z-index:20;background:radial-gradient(100% 60% at 50% 0%,#3A230F 0%,transparent 70%),var(--brand);color:var(--on-brand);display:none;overflow:auto;animation:up .3s ease-out}
+.call.open{display:block}
+@keyframes up{from{transform:translateY(30px);opacity:.4}}
+.call .wrap{max-width:460px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(130px + env(safe-area-inset-bottom,0px))}
+.callhd{display:flex;justify-content:space-between;align-items:center}
+.urg{display:inline-flex;align-items:center;gap:6px;background:var(--warn);color:#fff;font-weight:700;font-size:13.5px;padding:6px 12px;border-radius:999px}
+.urg svg{width:15px;height:15px}
+.timer{position:relative;width:56px;height:56px}
+.timer svg{width:56px;height:56px;transform:rotate(-90deg)}
+.timer circle{fill:none;stroke-width:4}
+.timer .bg{stroke:rgba(255,255,255,.12)}
+.timer .fg{stroke:var(--orange);stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.timer span{position:absolute;inset:0;display:grid;place-items:center;font-family:"Outfit",sans-serif;font-weight:800;font-size:18px}
+.call h2{font-size:27px;margin:18px 0 4px}
+.call .sub{color:var(--on-brand-muted);font-size:14.5px;margin:0 0 16px}
+.dist{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.dist div{background:rgba(255,255,255,.06);border-radius:16px;padding:12px 14px}
+.dist small{color:var(--on-brand-muted);font-size:12.5px;display:block}
+.dist .num{font-size:22px}
+.cblock{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px;margin-bottom:10px}
+.cblock .lab{font-size:12.5px;color:var(--on-brand-muted);font-weight:600;margin-bottom:6px}
+.equip{display:flex;gap:12px;align-items:center}
+.equip .ph{display:flex;gap:4px}
+.equip .ph svg{width:46px;height:46px;border-radius:10px;display:block}
+.equip b{font-size:16px;display:block}
+.equip small{color:var(--on-brand-muted);font-size:13px}
+.ctags{display:flex;flex-wrap:wrap;gap:6px}
+.ctags span{background:rgba(255,255,255,.08);border-radius:9px;padding:5px 10px;font-size:13.5px}
+.ctags span.o{background:rgba(255,107,0,.18);color:var(--orange-2);font-weight:600}
+.earn{background:linear-gradient(135deg,rgba(255,138,43,.22),rgba(255,107,0,.12));border:1px solid rgba(255,107,0,.4)}
+.earn .num{font-size:26px;color:var(--orange-2)}
+.earn small{color:var(--on-brand-muted);font-size:12.5px;display:block;margin-top:4px}
+.callbar{position:fixed;left:0;right:0;bottom:0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--brand) 75%,transparent)}
+.callbar .inner{max-width:428px;margin:0 auto;display:grid;grid-template-columns:1fr 2.2fr;gap:8px}
+.callbar button{min-height:60px;border-radius:18px;font-weight:700;font-size:17px}
+.callbar .no{background:rgba(255,255,255,.08);color:var(--on-brand-muted)}
+.callbar .yes{background:linear-gradient(135deg,var(--ok-2),var(--ok));color:#fff;box-shadow:0 8px 24px rgba(21,137,90,.4)}
+.exclusive{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--on-brand-muted);margin-top:4px}
+.exclusive svg{width:16px;height:16px;color:var(--orange-2)}
+
+/* dispatch */
+.mapwrap{position:relative;border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
+.mapwrap svg{display:block;width:100%;height:auto}
+.mappill{position:absolute;top:12px;left:12px;background:var(--brand);color:var(--on-brand);border-radius:999px;padding:7px 14px;font-size:13.5px;font-weight:600}
+.mappill b{color:var(--orange-2)}
+.card{background:var(--surface);border-radius:20px;padding:16px;margin-top:10px;box-shadow:var(--shadow)}
+.card .lab{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:6px}
+.cust{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cust b{display:block;font-size:16.5px}
+.cust small{color:var(--muted);font-size:13.5px}
+.round{width:46px;height:46px;border-radius:50%;background:var(--chip);display:grid;place-items:center;flex:none}
+.prep{display:flex;flex-wrap:wrap;gap:6px}
+.prep label{display:flex;align-items:center;gap:6px;background:var(--chip);border-radius:10px;padding:7px 10px;font-size:14px;cursor:pointer}
+.prep input{accent-color:var(--orange);width:17px;height:17px;margin:0}
+.timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);text-align:center;font-size:12px;color:var(--muted)}
+.timeline li{position:relative;padding-top:24px}
+.timeline li::before{content:"";position:absolute;top:4px;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:var(--surface);border:2.5px solid var(--line);z-index:1}
+.timeline li::after{content:"";position:absolute;top:10px;left:-50%;width:100%;height:2.5px;background:var(--line)}
+.timeline li:first-child::after{display:none}
+.timeline li.done{color:var(--ink);font-weight:600}
+.timeline li.done::before,.timeline li.done::after{background:var(--orange);border-color:var(--orange)}
+
+/* complete */
+.money{display:flex;align-items:center;gap:8px}
+.money .inp{text-align:right;font-family:"Outfit",sans-serif;font-weight:700;font-size:18px}
+.money span{font-weight:600;color:var(--muted)}
+.partlist{display:grid;gap:8px}
+.partlist label{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer}
+.partlist label:has(input:checked){border-color:var(--orange);background:var(--orange-soft)}
+.partlist input{accent-color:var(--orange);width:20px;height:20px;margin:0}
+.partlist b{flex:1;font-weight:600;font-size:15px}
+.partlist span{font-weight:600}
+.bill{background:linear-gradient(180deg,var(--brand-2),var(--brand));color:var(--on-brand);border-radius:22px;padding:18px;margin-top:6px}
+.bill .r{display:flex;justify-content:space-between;padding:6px 0;font-size:14.5px;color:var(--on-brand-muted)}
+.bill .r b{color:var(--on-brand);font-weight:600}
+.bill .r.minus b{color:#FF9A7A}
+.bill hr{border:0;border-top:1px dashed rgba(255,255,255,.15);margin:8px 0}
+.bill .mine{display:flex;justify-content:space-between;align-items:baseline;margin-top:4px}
+.bill .mine span{font-weight:600}
+.bill .mine .num{font-size:30px;color:var(--orange-2)}
+.bill small{display:block;color:var(--on-brand-muted);font-size:12.5px;margin-top:8px}
+
+/* paid */
+.okbig{width:90px;height:90px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;margin:30px auto 16px;box-shadow:0 10px 30px rgba(21,137,90,.35)}
+.okbig svg{width:44px;height:44px;stroke-width:2.6}
+.wait{width:90px;height:90px;border-radius:50%;border:5px solid var(--line);border-top-color:var(--orange);margin:30px auto 16px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fast{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--surface);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);margin-top:10px}
+.fast b{display:block;font-size:15px}
+.fast small{color:var(--muted);font-size:13px}
+.tg{width:52px;height:30px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .2s}
+.tg::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tg[aria-pressed="true"]{background:var(--orange)}
+.tg[aria-pressed="true"]::after{transform:translateX(22px)}
+
+/* settle */
+.settlehd{background:linear-gradient(180deg,var(--brand-2),var(--brand));color:var(--on-brand);border-radius:24px;padding:20px}
+.settlehd small{color:var(--on-brand-muted);font-size:13.5px}
+.settlehd .num{font-size:36px;display:block;margin:4px 0}
+.settlehd .when{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.08);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
+.taxnote{font-size:13px;color:var(--muted);margin-top:12px;padding:0 4px}
+
+/* bar */
+.bar{position:fixed;left:0;right:0;bottom:0;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--page) 72%,transparent)}
+.bar .inner{max-width:428px;margin:0 auto}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:58px;border-radius:18px;font-weight:700;font-size:17px}
+.btn.primary{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#fff;box-shadow:0 8px 22px rgba(255,107,0,.3)}
+.btn.primary:disabled{background:var(--line);color:var(--muted);box-shadow:none;cursor:not-allowed}
+.btn.soft{background:var(--surface);box-shadow:var(--shadow);min-height:52px;font-size:15.5px;font-weight:600}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--brand);color:var(--on-brand);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:30;display:none;white-space:nowrap}
+
+.photoreg{display:flex;gap:14px;align-items:center}
+.pphoto{width:92px;height:92px;border-radius:50%;flex:none;background:var(--chip);border:2px dashed var(--line);display:grid;place-items:center;color:var(--muted);cursor:pointer;overflow:hidden;position:relative}
+.pphoto.has{border:3px solid var(--orange)}
+.pphoto input{position:absolute;width:1px;height:1px;opacity:0}
+.pphoto img,.pphoto svg.av{width:100%;height:100%;object-fit:cover;display:block}
+.pphoto svg.i{width:28px;height:28px}
+.photoreg b{display:block;font-size:15px}
+.photoreg small{display:block;color:var(--muted);font-size:13px;line-height:1.5}
+.mini{margin-top:8px;font-size:13.5px;font-weight:600;color:var(--orange);padding:6px 0;text-decoration:underline;text-underline-offset:3px}
+.homehd .hi{display:flex;gap:12px;align-items:center}
+.hav{width:52px;height:52px;border-radius:50%;overflow:hidden;flex:none;border:2px solid var(--orange)}
+.hav img,.hav svg{width:100%;height:100%;object-fit:cover;display:block}
+.rvbox{background:var(--surface);border-radius:20px;padding:16px;box-shadow:var(--shadow)}
+.rvtop{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.rvtop .num{font-size:38px;line-height:1}
+.rvtop .st{color:var(--orange);letter-spacing:2px}
+.rvtop small{color:var(--muted);font-size:13px;display:block}
+.tbar{display:grid;grid-template-columns:110px 1fr 34px;gap:10px;align-items:center;font-size:13.5px;margin:7px 0}
+.tbar i{display:block;height:8px;border-radius:4px;background:var(--chip);overflow:hidden}
+.tbar i b{display:block;height:100%;background:var(--orange);border-radius:4px}
+.tbar span:last-child{text-align:right;font-weight:600}
+.rvlist{margin-top:10px;display:grid;gap:8px}
+.rvi{background:var(--surface);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);font-size:14.5px}
+.rvi .h{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:4px}
+.rvi .h b{color:var(--orange);font-weight:600;letter-spacing:1px}
+.rvi .tg{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.rvi .tg span{background:var(--orange-soft);color:var(--orange);border-radius:8px;padding:2px 8px;font-size:12.5px;font-weight:600}
+
+/* ===== CALL BOARD ===== */
+.boardbtn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 22px rgba(255,107,0,.3);margin-bottom:10px}
+.boardbtn .ic{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.2);display:grid;place-items:center;flex:none}
+.boardbtn b{display:block;font-size:16.5px}
+.boardbtn small{opacity:.9;font-size:13px}
+.boardbtn .cnt{margin-left:auto;background:#fff;color:var(--orange);font-family:"Outfit",sans-serif;font-weight:800;border-radius:999px;min-width:34px;height:34px;display:grid;place-items:center;padding:0 8px}
+.live{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);margin:2px 0 12px}
+.live .pulse{background:var(--warn)}
+.btabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--chip);border-radius:14px;padding:4px;gap:4px;margin-bottom:12px}
+.btabs button{min-height:44px;border-radius:11px;font-weight:600;font-size:14.5px;color:var(--muted)}
+.btabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.btabs b{font-family:"Outfit",sans-serif;margin-left:4px;color:var(--orange)}
+.clist{display:grid;gap:10px}
+.cc{background:var(--surface);border-radius:20px;padding:14px;box-shadow:var(--shadow);border:1.5px solid transparent;animation:in .3s ease-out}
+.cc.new{border-color:var(--orange-line)}
+.cc.mine{border-color:var(--ok)}
+.cc .r1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;display:inline-flex;gap:4px;align-items:center}
+.pill.n{background:var(--orange-soft);color:var(--orange)}
+.pill.u{background:var(--warn-soft);color:var(--warn)}
+.pill.m{background:#E6F0FF;color:#2F64C7}
+.pill.d{background:var(--chip);color:var(--muted)}
+.pill.me{background:var(--ok-soft);color:var(--ok)}
+.pill.b{background:#FFF6D6;color:#9A6A00}
+.cc .tm{font-family:"Outfit",sans-serif;font-weight:800;font-size:18px;color:var(--orange)}
+.cc .tm.low{color:var(--warn)}
+.cc h4{margin:8px 0 2px;font-size:16.5px;letter-spacing:-0.02em}
+.cc .meta{font-size:13.5px;color:var(--muted)}
+.cc .r3{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px}
+.cc .earnv{font-weight:700;font-size:15px}
+.cc .earnv small{font-weight:500;color:var(--muted);font-size:12.5px;display:block}
+.cc .grab{min-height:44px;padding:0 18px;border-radius:13px;background:var(--orange);color:#fff;font-weight:700;font-size:15px}
+.cc .who{font-size:13.5px;color:var(--muted);margin-top:8px}
+.cc .watch{font-size:12.5px;color:var(--muted)}
+.boardnote{font-size:12.5px;color:var(--muted);text-align:center;margin-top:14px}
+[hidden]{display:none!important}
+
+/* swipe to confirm */
+.swipe{position:relative;height:62px;border-radius:18px;background:linear-gradient(135deg,var(--orange-2),var(--orange));overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 8px 22px rgba(255,107,0,.3)}
+.swipe .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(0,0,0,.14)}
+.swipe .lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;font-weight:700;font-size:17px;padding-left:56px;pointer-events:none;transition:opacity .1s}
+.swipe .lbl i{font-style:normal;opacity:.7;animation:nudge 1.2s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(5px);opacity:1}}
+.knob{position:absolute;left:5px;top:5px;width:52px;height:52px;border-radius:14px;background:#fff;color:var(--orange);display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.18);cursor:grab;touch-action:none}
+.knob svg{width:26px;height:26px;stroke-width:2.6}
+.knob.snap{transition:transform .25s ease}
+@media (prefers-reduced-motion: reduce){.swipe .lbl i{animation:none}}
+.undo{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));width:calc(100% - 32px);max-width:428px;background:var(--brand);color:var(--on-brand);border-radius:16px;padding:12px 12px 14px 16px;display:flex;align-items:center;gap:10px;z-index:15;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.undo span{flex:1;font-size:14px;line-height:1.4}
+.undo span small{display:block;color:var(--on-brand-muted);font-size:12.5px}
+.undo button{flex:none;min-height:42px;padding:0 16px;border-radius:12px;background:var(--orange);color:#fff;font-weight:700;font-size:14.5px}
+.undo i{position:absolute;left:0;bottom:0;height:3px;background:var(--orange-2);width:100%}
+.undo i.run{transition:width 5s linear;width:0}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/></symbol>
+  <symbol id="i-won" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7.5 8.5l2 7 2.5-6 2.5 6 2-7M7 12h10"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".5"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h3.5l1.5 4-2 1.5a11 11 0 0 0 6.5 6.5l1.5-2 4 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-nav" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
+  <symbol id="i-cert" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><circle cx="12" cy="17" r="3"/><path d="M10.5 19.5L10 22l2-1 2 1-.5-2.5M7 8h10M7 11h6"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-4.5"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h2l1.6-2h5.8l1.6 2h2A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.8"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+</svg>
+
+<div class="app">
+  <div id="stepHead" hidden>
+    <header class="top">
+      <button class="back" id="backBtn" aria-label="뒤로"><svg class="i"><use href="#i-back"/></svg></button>
+      <span class="title" id="stepTitle"></span><span class="count" id="stepCount"></span>
+    </header>
+    <div class="progress" id="progress"><span></span><span></span><span></span><span></span></div>
+  </div>
+
+  <main>
+  <!-- INTRO -->
+  <section class="screen on" id="s-intro">
+    <div class="hero">
+      <span class="mark"><span class="en">JIKK<span class="lens"></span></span><span class="tag">파트너</span></span>
+      <h1>헛걸음 없는 출동,<br>찍꼬 파트너로<br>일감을 받으세요</h1>
+      <p>출발 전에 장비, 에러코드, 필요한 부품까지 다 알고 갑니다.</p>
+      <div class="ticketprev" aria-label="호출 예시">
+        <div class="row"><span>장비</span><b>LG 업소용 냉장고 C1100</b></div>
+        <div class="row"><span>에러코드</span><b class="o">E1 · 온도 센서</b></div>
+        <div class="row"><span>챙길 부품</span><b class="o">온도 센서, 냉매(R-134a)</b></div>
+        <div class="row"><span>예상 수입</span><b>약 9만~14만 원</b></div>
+      </div>
+    </div>
+    <div class="section">
+      <h3>파트너가 되면</h3>
+      <div class="why">
+        <div><span class="ic"><svg class="i"><use href="#i-box"/></svg></span><span><b>부품 챙겨서 한 번에 해결</b><small>사진·라벨·에러코드를 AI가 정리해서 보내드려요.</small></span></div>
+        <div><span class="ic"><svg class="i"><use href="#i-target"/></svg></span><span><b>내 전문 장비 호출만 받아요</b><small>등록한 장비와 지역에 맞는 요청만 울려요.</small></span></div>
+        <div><span class="ic"><svg class="i"><use href="#i-won"/></svg></span><span><b>떼일 걱정 없는 정산</b><small>사장님 결제는 찍꼬가 보관하고, 매주 수요일 입금돼요.</small></span></div>
+      </div>
+      <div class="fee">
+        <div class="r"><span>출장비·공임 수수료</span><b>15%</b></div>
+        <div class="r"><span>부품비 수수료</span><b>5%</b></div>
+        <div class="r"><span>카드 결제 수수료</span><b>찍꼬 부담</b></div>
+        <div class="r"><span>정산일</span><b>매주 수요일 (빠른 정산 가능)</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REG 1 -->
+  <section class="screen" id="s-r1">
+    <h2>기본 정보를 알려주세요</h2>
+    <p class="lead">사장님께 보여질 이름과 연락처예요.</p>
+    <div class="field"><span class="lab">가입 유형</span>
+      <div class="seg" id="typeSeg"><button aria-pressed="true" data-v="person">개인 기사</button><button aria-pressed="false" data-v="biz">사업자 · 업체</button></div>
+    </div>
+    <div class="field"><span class="lab">프로필 사진</span>
+      <div class="photoreg">
+        <label class="pphoto" id="pphoto" aria-label="프로필 사진 올리기"><input type="file" accept="image/*" id="photoIn"><span id="photoView" style="display:contents"><svg class="i"><use href="#i-cam"/></svg></span></label>
+        <div><b>사장님께 보여질 사진이에요</b><small>작업복 입은 밝은 정면 사진이면 사장님이 더 안심하고 문을 열어드려요.</small><button class="mini" id="samplePhoto" type="button">데모: 샘플 사진 쓰기</button></div>
+      </div></div>
+    <div class="field"><label for="name">이름</label><input class="inp" id="name" placeholder="홍길동" autocomplete="name"></div>
+    <div class="field"><label for="phone">휴대폰 번호</label>
+      <div class="inrow"><input class="inp" id="phone" inputmode="numeric" placeholder="010-0000-0000" autocomplete="tel"><button class="sbtn" id="sendCode">인증받기</button></div>
+    </div>
+    <div class="field" id="codeField" hidden><label for="code">인증번호</label><input class="inp" id="code" inputmode="numeric" placeholder="6자리"><small class="help">데모 화면이라 인증번호가 자동으로 채워져요.</small></div>
+  </section>
+
+  <!-- REG 2 -->
+  <section class="screen" id="s-r2">
+    <h2>어떤 장비를 고치세요?</h2>
+    <p class="lead">고를수록 호출이 많아져요. 자신 있는 것만 골라주세요.</p>
+    <div class="field"><span class="lab">전문 장비</span><div class="chips" id="equipChips"></div></div>
+    <div class="field"><span class="lab">자주 다루는 브랜드 (선택)</span><div class="chips" id="brandChips"></div></div>
+    <div class="field"><span class="lab">활동 지역</span><div class="chips" id="areaChips"></div></div>
+    <div class="field"><span class="lab">출동 반경</span>
+      <div class="seg" id="radiusSeg"><button aria-pressed="false" data-v="3">3km</button><button aria-pressed="true" data-v="5">5km</button><button aria-pressed="false" data-v="10">10km</button></div>
+      <small class="help">반경 안에서 들어온 호출만 알려드려요.</small>
+    </div>
+  </section>
+
+  <!-- REG 3 -->
+  <section class="screen" id="s-r3">
+    <h2>경력과 서류를 올려주세요</h2>
+    <p class="lead">찍꼬가 확인한 기사님만 사장님께 연결돼요.</p>
+    <div class="field"><label for="career">경력</label>
+      <select class="inp" id="career"><option value="">선택해주세요</option><option>1~3년</option><option>3~5년</option><option>5~10년</option><option>10년 이상</option></select></div>
+    <div class="field"><span class="lab">자격증 (선택)</span>
+      <label class="upl" data-up="cert"><span class="ic"><svg class="i"><use href="#i-cert"/></svg></span><span><b>자격증 사진 올리기</b><small>공조냉동기계기능사, 전기기능사 등</small></span><input type="file" accept="image/*,application/pdf"></label></div>
+    <div class="field" id="bizDocField" hidden><span class="lab">사업자등록증</span>
+      <label class="upl" data-up="biz"><span class="ic"><svg class="i"><use href="#i-doc"/></svg></span><span><b>사업자등록증 올리기</b><small>세금계산서 자동 발행에 필요해요</small></span><input type="file" accept="image/*,application/pdf"></label></div>
+    <div class="field"><span class="lab">배상책임보험</span>
+      <div class="seg" id="insSeg"><button aria-pressed="false" data-v="y">가입했어요</button><button aria-pressed="false" data-v="n">아직이에요</button></div>
+      <small class="help">가입하면 프로필에 ‘보험 가입’ 배지가 붙어요.</small>
+      <p class="notice" id="insWarn" hidden style="margin-top:10px"><b>누수·하수구·간판·전기</b> 작업은 이웃이나 건물에 피해가 생길 수 있어서 <b>배상책임보험 가입이 필수</b>예요. 가입 후 증권을 올려주시면 바로 승인해드려요.</p>
+    </div>
+  </section>
+
+  <!-- REG 4 -->
+  <section class="screen" id="s-r4">
+    <h2>정산 받을 계좌를 알려주세요</h2>
+    <p class="lead">완료한 작업 금액이 매주 수요일 이 계좌로 들어와요.</p>
+    <div class="notice" id="taxNotice"></div>
+    <div class="field"><label for="bank">은행</label>
+      <select class="inp" id="bank"><option value="">선택해주세요</option><option>국민은행</option><option>신한은행</option><option>우리은행</option><option>하나은행</option><option>농협은행</option><option>기업은행</option><option>카카오뱅크</option><option>토스뱅크</option></select></div>
+    <div class="field"><label for="acct">계좌번호</label><input class="inp" id="acct" inputmode="numeric" placeholder="- 없이 입력"><small class="help">데모 화면이라 입력한 내용은 저장되지 않아요.</small></div>
+    <label class="check"><input type="checkbox" id="agree"><span>수수료(출장비·공임 15%, 부품 5%)와 정산 규칙, 30일 무상 재방문 보증에 동의해요.</span></label>
+  </section>
+
+  <!-- REVIEW -->
+  <section class="screen" id="s-review">
+    <div class="big-ic"><svg class="i"><use href="#i-shield"/></svg></div>
+    <div class="center"><h2>등록 신청이 접수됐어요</h2><p class="lead">보통 1~2일 안에 결과를 문자로 알려드려요.</p></div>
+    <ol class="vsteps">
+      <li class="done"><span class="dot">✓</span><span><b>신청서 접수</b><small>방금 전</small></span></li>
+      <li class="now"><span class="dot">2</span><span><b>서류·경력 확인</b><small>자격증과 사업자 정보를 확인해요</small></span></li>
+      <li><span class="dot">3</span><span><b>전화 인터뷰</b><small>10분 정도 걸려요</small></span></li>
+      <li><span class="dot">4</span><span><b>승인 후 호출 받기 시작</b></span></li>
+    </ol>
+  </section>
+
+  <!-- HOME -->
+  <section class="screen" id="s-home">
+    <div class="homehd">
+      <span class="mark"><span class="en">JIKK<span class="lens"></span></span><span class="tag">파트너</span></span>
+      <div class="hi"><span class="hav" id="homeAv"></span><span>반가워요<b id="hiName">김도윤 기사님</b></span></div>
+      <button class="online" id="onlineBtn" aria-pressed="false">
+        <span class="sw" aria-hidden="true"></span>
+        <span><b id="onTitle">지금은 쉬는 중</b><small id="onSub">켜면 호출을 받을 수 있어요</small></span>
+      </button>
+      <div class="stats">
+        <div><span class="num" id="stDone">3</span><small>이번 주 완료</small></div>
+        <div><span class="num">4.9</span><small>평점</small></div>
+        <div><span class="num">98%</span><small>수락률</small></div>
+      </div>
+    </div>
+    <div class="section">
+      <button class="boardbtn" id="toBoard"><span class="ic"><svg class="i"><use href="#i-list"/></svg></span><span><b>실시간 콜 현황판</b><small>지금 들어온 호출을 먼저 잡으세요</small></span><span class="cnt" id="newCnt">2</span></button>
+      <button class="paycard" id="toSettle"><span><small>이번 주 정산 예정</small><span class="num" id="homePay">321,900</span><span style="font-weight:700">원</span></span><span class="go">정산 보기<svg class="i" style="width:18px;height:18px"><use href="#i-next"/></svg></span></button>
+      <button class="testbtn" id="testCall">테스트 호출 바로 받아보기</button>
+      <h3>사장님들이 남긴 평가</h3>
+      <div class="rvbox">
+        <div class="rvtop"><span class="num" id="rvAvg">4.9</span><span><span class="st">★★★★★</span><small id="rvCount">리뷰 214개</small></span></div>
+        <div id="tagBars"></div>
+      </div>
+      <div class="rvlist" id="rvList"></div>
+    </div>
+  </section>
+
+  <!-- DISPATCH -->
+  <section class="screen" id="s-go">
+    <div class="mapwrap">
+      <svg viewBox="0 0 400 230" aria-hidden="true">
+        <rect width="400" height="230" fill="#E6E8EB"/>
+        <g fill="#F7F8F9"><rect y="36" width="400" height="16"/><rect y="140" width="400" height="20"/><rect x="70" width="16" height="230"/><rect x="200" width="20" height="230"/><rect x="320" width="14" height="230"/></g>
+        <g fill="#D7EBD9"><rect x="230" y="60" width="80" height="70" rx="6"/><rect x="92" y="170" width="96" height="60" rx="6"/></g>
+        <g fill="#DADDE1"><rect x="96" y="60" width="96" height="70" rx="6"/><rect x="10" y="60" width="52" height="70" rx="6"/><rect x="230" y="170" width="80" height="60" rx="6"/></g>
+        <path d="M327 205 V150 H210 V44 H78" fill="none" stroke="#FF6B00" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="327" cy="205" r="9" fill="#17191D" stroke="#fff" stroke-width="3"/>
+        <g transform="translate(78 44)"><circle r="15" fill="#FF6B00"/><path d="M-6 -2 L0 -8 L6 -2 V7 H-6Z" fill="#fff"/></g>
+      </svg>
+      <div class="mappill" id="mapPill">도착까지 <b>14분</b> · 1.8km</div>
+    </div>
+    <div class="card">
+      <div class="cust">
+        <span><b>○○식당 사장님</b><small>서울 마포구 ○○로 12, 1층 주방</small></span>
+        <span style="display:flex;gap:6px">
+          <button class="round" aria-label="전화하기" onclick="toast('데모: 사장님께 안심번호로 연결돼요')"><svg class="i"><use href="#i-phone"/></svg></button>
+          <button class="round" aria-label="길안내" onclick="toast('데모: 내비 앱이 열려요')"><svg class="i"><use href="#i-nav"/></svg></button>
+        </span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="lab">출발 전 챙길 것 (체크해두세요)</div>
+      <div class="prep"><label><input type="checkbox">온도 센서</label><label><input type="checkbox">냉매 R-134a</label><label><input type="checkbox">매니폴드 게이지</label></div>
+    </div>
+    <div class="card">
+      <div class="lab">진행 단계</div>
+      <ol class="timeline" id="goTl"><li class="done">수락</li><li>도착</li><li>수리 중</li><li>완료</li></ol>
+    </div>
+  </section>
+
+  <!-- COMPLETE -->
+  <section class="screen" id="s-done">
+    <h2>작업 금액을 입력해주세요</h2>
+    <p class="lead">사장님이 확인 버튼을 누르면 결제가 진행돼요.</p>
+    <div class="field"><label for="fCall">출장비</label><div class="money"><input class="inp" id="fCall" inputmode="numeric" value="20,000"><span>원</span></div></div>
+    <div class="field"><label for="fLabor">공임</label><div class="money"><input class="inp" id="fLabor" inputmode="numeric" value="90,000"><span>원</span></div></div>
+    <div class="field"><span class="lab">사용한 부품</span>
+      <div class="partlist" id="parts">
+        <label><input type="checkbox" data-p="40000" checked><b>온도 센서</b><span>40,000원</span></label>
+        <label><input type="checkbox" data-p="30000"><b>냉매 R-134a 보충</b><span>30,000원</span></label>
+        <label><input type="checkbox" data-p="45000"><b>도어 패킹 고무</b><span>45,000원</span></label>
+      </div>
+    </div>
+    <div class="field"><span class="lab">작업 후 사진</span>
+      <label class="upl" data-up="after"><span class="ic"><svg class="i"><use href="#i-cam"/></svg></span><span><b>수리 후 사진 올리기</b><small>보증 처리와 리뷰에 쓰여요</small></span><input type="file" accept="image/*" capture="environment"></label></div>
+    <div class="field"><span class="lab">보험 청구용 서류 <span style="color:var(--muted);font-weight:500">(사장님이 이웃 피해 있음 선택 시)</span></span>
+      <div class="fee" style="margin-top:0">
+        <label class="check" style="padding:6px 0"><input type="checkbox" checked disabled><span>수리 확인서 · 영수증 <small style="color:var(--muted)">(자동 생성)</small></span></label>
+        <label class="check" style="padding:6px 0"><input type="checkbox" checked disabled><span>수리 전후 사진 <small style="color:var(--muted)">(호출 사진 + 작업 후 사진 자동 첨부)</small></span></label>
+        <label for="opinion" style="display:block;font-size:14px;font-weight:600;margin:8px 0 6px">원인 소견</label>
+        <select class="inp" id="opinion"><option>해당 없음</option><option>위층 배관 누수로 인한 피해</option><option>건물 공용 배관 막힘으로 인한 역류</option><option>노후 부품 파손으로 인한 고장</option><option>외부 충격·사고로 인한 파손</option></select>
+        <small class="help">소견서는 기사님 이름으로 발행돼요. 보험 적용 여부는 보험사가 판단해요.</small>
+      </div></div>
+    <div class="bill" id="bill"></div>
+  </section>
+
+  <!-- WAIT / PAID -->
+  <section class="screen" id="s-paid">
+    <div id="waitBox" class="center"><div class="wait" aria-hidden="true"></div><h2>사장님 확인을 기다리고 있어요</h2><p class="lead">사장님 휴대폰으로 금액 확인 요청을 보냈어요.</p></div>
+    <div id="paidBox" hidden>
+      <div class="okbig"><svg class="i"><use href="#i-check"/></svg></div>
+      <div class="center"><h2>결제가 완료됐어요</h2><p class="lead" id="paidLead"></p></div>
+      <div class="hist"><div class="r"><span><b>내 정산 금액</b><small>수수료 차감 후</small></span><span class="amt num" id="paidAmt" style="font-size:22px"></span></div>
+        <div class="r"><span><b>입금 예정</b><small id="paidWhenSub">매주 수요일 정산</small></span><span class="amt" id="paidWhen"></span></div>
+        <div class="r"><span><b>30일 무상 재방문 보증</b><small>앱 결제 건에 자동 적용</small></span><span class="amt" style="color:var(--ok)">적용</span></div></div>
+      <div class="fast"><span><b>내일 바로 받기</b><small>빠른 정산 수수료 1.5%</small></span><button class="tg" id="fastTg" aria-pressed="false" aria-label="빠른 정산"></button></div>
+    </div>
+  </section>
+
+  <!-- BOARD -->
+  <section class="screen" id="s-board">
+    <div class="live"><span class="pulse"></span><span id="liveTxt">마포구 · 반경 5km · 실시간</span></div>
+    <div class="btabs" id="btabs"><button aria-pressed="true" data-t="new">신규<b id="cN">0</b></button><button aria-pressed="false" data-t="matched">매칭<b id="cM">0</b></button><button aria-pressed="false" data-t="done">완료<b id="cD">0</b></button></div>
+    <div class="clist" id="clist"></div>
+    <p class="boardnote">사장님 정확한 주소는 호출을 잡은 기사님에게만 공개돼요.<br>5분 안에 아무도 안 잡으면 반경이 넓어지고 보너스가 붙어요.</p>
+  </section>
+
+  <!-- SETTLE -->
+  <section class="screen" id="s-settle">
+    <div class="settlehd"><small>이번 주 정산 예정</small><span class="num" id="setTotal"></span><span class="when"><svg class="i" style="width:15px;height:15px"><use href="#i-clock"/></svg>10월 7일 (수) 입금</span></div>
+    <h3 style="font-size:16px;margin:20px 4px 10px">이번 주 작업 내역</h3>
+    <div class="hist" id="setList"></div>
+    <p class="taxnote" id="taxLine"></p>
+  </section>
+  </main>
+
+  <div class="bar" id="bar"><div class="inner"><button class="btn primary" id="cta">파트너 등록 시작하기</button>
+    <div class="swipe" id="swipe" hidden><div class="fill" id="swFill"></div><div class="lbl"><span id="swLabel">밀어서 현장 도착</span><i aria-hidden="true">›››</i></div>
+      <button class="knob" id="knob" aria-label="다음 단계로 넘어가기 (Enter)"><svg class="i"><use href="#i-next"/></svg></button></div></div></div>
+  <div class="undo" id="undo" hidden role="status"><span id="undoTxt"></span><button id="undoBtn">되돌리기</button><i id="undoBar"></i></div>
+</div>
+
+<!-- INCOMING CALL -->
+<div class="call" id="call" role="alertdialog" aria-modal="true" aria-labelledby="callTitle">
+  <div class="wrap">
+    <div class="callhd"><span class="urg"><svg class="i"><use href="#i-bolt"/></svg>긴급 출동 요청</span>
+      <div class="timer" aria-label="남은 시간"><svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="24"/><circle class="fg" id="tfg" cx="28" cy="28" r="24" stroke-dasharray="150.8" stroke-dashoffset="0"/></svg><span id="tnum">30</span></div></div>
+    <h2 id="callTitle">냉장고가 안 시원하대요</h2>
+    <p class="sub">재료 손실 위험이 있는 매장이에요.</p>
+    <div class="dist"><div><small>거리</small><span class="num">1.8</span> km</div><div><small>예상 이동</small><span class="num">14</span> 분</div></div>
+    <div class="cblock"><div class="lab">장비</div>
+      <div class="equip"><div class="ph">
+        <svg viewBox="0 0 46 46"><rect width="46" height="46" fill="#3A3530"/><rect x="11" y="6" width="24" height="34" rx="2" fill="#C7CCD1"/><line x1="23" y1="7" x2="23" y2="39" stroke="#8B9097"/></svg>
+        <svg viewBox="0 0 46 46"><rect width="46" height="46" fill="#F4F4F0"/><rect width="46" height="12" fill="#A50034"/><text x="5" y="10" font-size="8" fill="#fff" font-weight="700" font-family="sans-serif">LG</text><rect x="5" y="18" width="30" height="3" fill="#888"/><rect x="5" y="25" width="24" height="3" fill="#888"/><rect x="5" y="32" width="28" height="3" fill="#888"/></svg>
+        <svg viewBox="0 0 46 46"><rect width="46" height="46" fill="#0D1410"/><text x="23" y="31" font-size="18" text-anchor="middle" fill="#FF4A26" font-family="monospace" font-weight="700">E1</text></svg>
+      </div><div><b>LG 업소용 냉장고</b><small>C1100 · 2021년식 · R-134a</small></div></div></div>
+    <div class="cblock"><div class="lab">증상 · AI 추정 원인</div>
+      <div class="ctags"><span>안 시원해요</span><span class="o">에러 E1 · 온도 센서</span><span>냉매 부족 가능</span><span>콘덴서 먼지</span></div></div>
+    <div class="cblock"><div class="lab">챙겨갈 부품</div><div class="ctags"><span class="o">온도 센서</span><span class="o">냉매 R-134a</span></div></div>
+    <div class="cblock earn"><div class="lab">예상 수입 (수수료 차감 후)</div><span class="num">93,500 ~ 144,500</span> 원<small>사장님 예상 견적 11만~17만 원 기준이에요.</small></div>
+    <div class="exclusive"><svg class="i"><use href="#i-lock"/></svg>LG 업소용 냉장 전문 기사님 4명에게만 보낸 요청이에요. 먼저 수락하면 배정돼요.</div>
+  </div>
+  <div class="callbar"><div class="inner"><button class="no" id="decline">거절</button><button class="yes" id="accept">수락하고 출발</button></div></div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var fmt=function(n){return Math.round(n).toLocaleString('ko-KR')};
+  var parse=function(v){return parseInt(String(v).replace(/[^0-9]/g,''),10)||0};
+  window.toast=function(m){var t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(function(){t.style.display='none'},2200)};
+
+  var AVSVG='<svg class="av" viewBox="0 0 56 56"><rect width="56" height="56" fill="#FFE2CC"/><circle cx="28" cy="23" r="10" fill="#E3A57E"/><path d="M17 20a11 9 0 0 1 22 0v-2H17z" fill="#2B2B2B"/><path d="M8 56c2-12 10-17 20-17s18 5 20 17z" fill="#24364F"/><rect x="25" y="39" width="6" height="8" fill="#FF6B00"/></svg>';
+  var st={type:'person',verified:false,equip:new Set(),area:new Set(),radius:'5',ins:null,online:false,fast:false,newJob:null};
+
+  // seg controls
+  function seg(id,cb){var el=$(id);el.querySelectorAll('button').forEach(function(b){b.onclick=function(){el.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});cb(b.dataset.v)}})}
+  seg('typeSeg',function(v){st.type=v;upd()});
+  seg('radiusSeg',function(v){st.radius=v});
+  seg('insSeg',function(v){st.ins=v;upd()});
+  function chips(id,list,set){list.forEach(function(t){var b=document.createElement('button');b.className='chip';b.textContent=t;b.setAttribute('aria-pressed','false');b.onclick=function(){var on=set&&set.has(t);if(set){on?set.delete(t):set.add(t)}else{on=b.getAttribute('aria-pressed')==='true'}b.setAttribute('aria-pressed',String(!on));upd()};$(id).appendChild(b)})}
+  chips('equipChips',['업소용 냉장·냉동고','쇼케이스','제빙기','식기세척기','업소용 에어컨','환풍기·후드·덕트','화장실·변기','보일러·온수기','누수 탐지','하수구·배관 막힘','간판 (LED·천갈이·풍선)','전기·차단기','셔터·도어락','커피머신','가스레인지·화구'],st.equip);
+  chips('brandChips',['LG','삼성','우성','대우','스타리온','호시자키','경동나비엔','린나이','귀뚜라미']);
+  chips('areaChips',['마포구','서대문구','은평구','용산구','영등포구','강서구','종로구','중구'],st.area);
+
+  $('sendCode').onclick=function(){
+    if(parse($('phone').value).toString().length<9){toast('휴대폰 번호를 먼저 입력해주세요');$('phone').focus();return}
+    $('codeField').hidden=false;$('sendCode').textContent='재전송';
+    setTimeout(function(){$('code').value='482913';st.verified=true;upd();toast('인증이 완료됐어요')},900);
+  };
+  ['name','phone','code','acct'].forEach(function(id){$(id).addEventListener('input',function(){upd()})});
+  ['career','bank'].forEach(function(id){$(id).addEventListener('change',function(){upd()})});
+  $('agree').addEventListener('change',function(){upd()});
+  document.querySelectorAll('.upl input').forEach(function(inp){inp.onchange=function(){if(!inp.files||!inp.files[0])return;var l=inp.closest('.upl');l.classList.add('done');l.querySelector('.ic').innerHTML='<svg class="i"><use href="#i-check"/></svg>';l.querySelector('small').textContent=inp.files[0].name;upd()}});
+
+  // flow
+  var FLOW={
+    intro:{t:'파트너 등록 시작하기',next:'r1',ok:function(){return true}},
+    r1:{title:'기본 정보',step:0,t:'다음',next:'r2',ok:function(){return $('name').value.trim()&&st.verified}},
+    r2:{title:'전문 분야',step:1,t:'다음',next:'r3',ok:function(){return st.equip.size&&st.area.size}},
+    r3:{title:'경력·서류',step:2,t:'다음',next:'r4',ok:function(){return $('career').value&&st.ins}},
+    r4:{title:'정산 계좌',step:3,t:'등록 신청하기',next:'review',ok:function(){return $('bank').value&&parse($('acct').value)>0&&$('agree').checked}},
+    review:{t:'데모: 승인됐다고 치고 넘어가기',next:'home',ok:function(){return true}},
+    home:null,
+    go:{title:'출동 중',t:'현장에 도착했어요',ok:function(){return true}},
+    done:{title:'작업 완료',t:'사장님께 금액 확인 요청',next:'paid',ok:function(){return total().sum>0}},
+    paid:{t:'홈으로',next:'home',ok:function(){return !$('paidBox').hidden}},
+    settle:{title:'정산',t:'홈으로',next:'home',ok:function(){return true}}
+  };
+  var BACK={r1:'intro',r2:'r1',r3:'r2',r4:'r3',settle:'home',done:'go'};
+  var cur='intro';
+
+  function upd(){
+    var f=FLOW[cur];$('bar').style.display=f?'':'none';if(!f)return;
+    $('cta').textContent=f.t;$('cta').disabled=!f.ok();
+  }
+  function go(id){
+    $('s-'+cur).classList.remove('on');cur=id;$('s-'+id).classList.add('on');
+    var f=FLOW[id];var hasHead=f&&f.title;
+    $('stepHead').hidden=!hasHead;$('backBtn').style.visibility=BACK[id]?'visible':'hidden';
+    var step=f&&f.step!=null?f.step:-1;$('progress').hidden=step<0;
+    $('stepTitle').textContent=hasHead?f.title:'';$('stepCount').textContent=step>=0?(step+1)+' / 4':'';
+    document.querySelectorAll('#progress span').forEach(function(s,i){s.classList.toggle('on',i<=step)});
+    if(id==='r3')$('bizDocField').hidden=st.type!=='biz';
+    if(id==='r4')$('taxNotice').innerHTML=st.type==='biz'?'<b>사업자 기사님</b>은 정산 금액 그대로 입금되고, 사장님께 세금계산서가 자동 발행돼요.':'<b>개인 기사님</b>은 사업소득 3.3%를 원천징수한 뒤 입금돼요.';
+    if(id==='home'){var n=$('name').value.trim();$('hiName').textContent=(n||'김도윤')+' 기사님';$('homePay').textContent=fmt(weekSum());}
+    if(id==='done')renderBill();
+    if(id==='paid')runPaid();
+    if(id==='settle')renderSettle();
+    if(id==='go'){if(!st.keepStage)goStage=0;st.keepStage=false;renderGo();}
+    upd();window.scrollTo(0,0);
+  }
+  $('cta').onclick=function(){
+    if(cur==='go'){goStage++;renderGo();return}
+    var f=FLOW[cur];if(f&&f.next)go(f.next);
+  };
+  $('backBtn').onclick=function(){if(cur==='done'){st.keepStage=true;goStage=2;}if(BACK[cur])go(BACK[cur])};
+
+  // home online + call
+  var callTimer=null,waitTimer=null,left=30;
+  $('onlineBtn').onclick=function(){
+    st.online=!st.online;this.setAttribute('aria-pressed',String(st.online));
+    $('onTitle').innerHTML=st.online?'<span class="pulse"></span>출동 대기 중':'지금은 쉬는 중';
+    $('onSub').textContent=st.online?'반경 '+st.radius+'km 안 호출을 기다리고 있어요':'켜면 호출을 받을 수 있어요';
+    clearTimeout(waitTimer);if(st.online)waitTimer=setTimeout(openCall,4000);
+  };
+  $('testCall').onclick=function(){if(!st.online)$('onlineBtn').click();clearTimeout(waitTimer);openCall()};
+  function openCall(){
+    if(cur!=='home'&&cur!=='board')return;
+    $('call').classList.add('open');document.body.style.overflow='hidden';
+    try{navigator.vibrate&&navigator.vibrate([400,200,400,200,400])}catch(e){}
+    left=30;tick();clearInterval(callTimer);callTimer=setInterval(function(){left--;tick();if(left<=0){grabbing=null;closeCall();toast('응답 시간이 지나 다른 기사님께 넘어갔어요')}},1000);
+    $('accept').focus();
+  }
+  function tick(){$('tnum').textContent=left;$('tfg').style.strokeDashoffset=150.8*(1-left/30)}
+  function closeCall(){clearInterval(callTimer);$('call').classList.remove('open');document.body.style.overflow=''}
+  $('decline').onclick=function(){closeCall();toast('거절했어요. 다음 호출을 기다릴게요')};
+  $('accept').onclick=function(){closeCall();go('go');toast('배정 완료! 사장님께 출발 알림을 보냈어요')};
+
+  // dispatch stages
+  var goStage=0;
+  function renderGo(){
+    var lis=$('goTl').querySelectorAll('li');lis.forEach(function(l,i){l.classList.toggle('done',i<=goStage)});
+    if(goStage===0){$('mapPill').innerHTML='도착까지 <b>14분</b> · 1.8km';FLOW.go.t='현장에 도착했어요'}
+    else if(goStage===1){$('mapPill').innerHTML='<b>현장 도착</b> · 사장님께 알림 보냄';FLOW.go.t='수리 시작'}
+    else if(goStage===2){$('mapPill').innerHTML='<b>수리 중</b>';FLOW.go.t='작업 완료 · 금액 입력'}
+    else{go('done');return}
+    upd();
+  }
+
+  // bill
+  function total(){
+    var call=parse($('fCall').value),labor=parse($('fLabor').value),parts=0;
+    document.querySelectorAll('#parts input:checked').forEach(function(c){parts+=+c.dataset.p});
+    var fee1=Math.round((call+labor)*0.15),fee2=Math.round(parts*0.05);
+    var mine=call+labor+parts-fee1-fee2;
+    var tax=st.type==='biz'?0:Math.floor(mine*0.033/10)*10;
+    return {call:call,labor:labor,parts:parts,sum:call+labor+parts,fee1:fee1,fee2:fee2,tax:tax,mine:mine-tax};
+  }
+  function renderBill(){
+    var t=total();
+    $('bill').innerHTML='<div class="r"><span>사장님 결제 금액</span><b>'+fmt(t.sum)+'원</b></div>'+
+      '<hr><div class="r minus"><span>수수료 · 출장비+공임 15%</span><b>−'+fmt(t.fee1)+'원</b></div>'+
+      '<div class="r minus"><span>수수료 · 부품 5%</span><b>−'+fmt(t.fee2)+'원</b></div>'+
+      
+      (t.tax?'<div class="r minus"><span>원천징수 3.3%</span><b>−'+fmt(t.tax)+'원</b></div>':'')+
+      '<div class="r"><span>카드 결제 수수료</span><b>찍꼬 부담</b></div><hr>'+
+      '<div class="mine"><span>내 정산 금액</span><span><span class="num">'+fmt(t.mine)+'</span>원</span></div>'+
+      '<small>사장님께는 출장비·공임·부품이 나눠진 영수증이 발행돼요.</small>';
+    upd();
+  }
+  ['fCall','fLabor'].forEach(function(id){$(id).addEventListener('input',function(){var v=parse(this.value);this.value=v?fmt(v):'';renderBill()})});
+  $('parts').addEventListener('change',renderBill);
+
+  // paid
+  function runPaid(){
+    $('waitBox').hidden=false;$('paidBox').hidden=true;upd();
+    var t=total();
+    setTimeout(function(){
+      if(cur!=='paid')return;
+      st.newJob={name:'○○식당 · 냉장고 센서 교체',amt:t.mine,sum:t.sum};st.reviewed=false;
+      $('waitBox').hidden=true;$('paidBox').hidden=false;
+      $('paidLead').textContent='사장님이 '+fmt(t.sum)+'원을 결제했어요.';
+      st.fast=false;$('fastTg').setAttribute('aria-pressed','false');paidAmt();
+      $('stDone').textContent='4';upd();
+    },2500);
+  }
+  function paidAmt(){
+    var a=st.newJob.amt,fee=st.fast?Math.round(a*0.015):0;
+    $('paidAmt').textContent=fmt(a-fee)+'원';
+    $('paidWhen').textContent=st.fast?'내일':'10월 7일 (수)';
+    $('paidWhenSub').textContent=st.fast?'빠른 정산 수수료 '+fmt(fee)+'원 차감':'매주 수요일 정산';
+  }
+  $('fastTg').onclick=function(){st.fast=!st.fast;this.setAttribute('aria-pressed',String(st.fast));paidAmt();toast(st.fast?'내일 바로 입금돼요':'수요일 정기 정산으로 바꿨어요')};
+
+  // settle
+  var PAST=[{name:'△△분식 · 제빙기 배수 수리',when:'10월 1일',amt:88400},{name:'□□카페 · 쇼케이스 팬 교체',when:'10월 2일',amt:102000},{name:'◇◇치킨 · 냉동고 냉매 보충',when:'10월 2일',amt:131500}];
+  function weekSum(){var s=PAST.reduce(function(a,b){return a+b.amt},0);if(st.newJob&&!st.fast)s+=st.newJob.amt;return s}
+  function renderSettle(){
+    $('setTotal').innerHTML=fmt(weekSum())+'<span style="font-size:18px;font-family:IBM Plex Sans KR">원</span>';
+    var rows=PAST.map(function(p){return '<div class="r"><span><b>'+p.name+'</b><small>'+p.when+' 완료</small></span><span class="amt">'+fmt(p.amt)+'원</span></div>'});
+    if(st.newJob)rows.push('<div class="r"><span><b>'+st.newJob.name+'<span class="new-tag">NEW</span></b><small>'+(st.fast?'빠른 정산 · 내일 별도 입금':'오늘 완료')+'</small></span><span class="amt">'+fmt(st.newJob.amt)+'원</span></div>');
+    $('setList').innerHTML=rows.join('');
+    $('taxLine').textContent=st.type==='biz'?'사업자 기사님: 찍꼬 수수료에 대한 세금계산서가 매달 자동 발행돼요.':'개인 기사님: 3.3% 원천징수 내역은 연말에 한 번에 받아보실 수 있어요.';
+  }
+  $('toSettle').onclick=function(){go('settle')};
+
+
+  // ---- call board (대리기사식 콜판) ----
+  var TPL=[
+    {eq:'LG 업소용 냉장고',sym:'안 시원해요 · E1',dong:'망원동',km:1.2,earn:[93500,144500],u:true},
+    {eq:'호시자키 제빙기',sym:'얼음이 안 나와요',dong:'합정동',km:2.4,earn:[59500,93500]},
+    {eq:'쇼케이스 냉장고',sym:'성에가 많이 껴요',dong:'서교동',km:0.8,earn:[68000,110500]},
+    {eq:'업소용 식기세척기',sym:'물이 안 빠져요',dong:'연남동',km:3.1,earn:[51000,85000]},
+    {eq:'삼성 업소용 냉동고',sym:'전원이 안 켜져요',dong:'상수동',km:1.9,earn:[110500,170000],u:true},
+    {eq:'우성 반찬 냉장고',sym:'소리가 커요',dong:'성산동',km:2.7,earn:[59500,102000]},
+    {eq:'대우 업소용 냉장고',sym:'물이 새요',dong:'도화동',km:3.4,earn:[42500,76500]}];
+  var OTH=['박○○','이○○','최○○','정○○','강○○'];
+  var calls=[],seq=0,btab='new',boardStarted=false;
+  function mk(left,status){var t=TPL[seq%TPL.length];seq++;return {id:seq,t:t,left:left,status:status||'new',watch:1+Math.floor(Math.random()*4),age:0,bonus:false}}
+  function initBoard(){
+    calls=[mk(262),mk(155)];
+    var m1=mk(0,'matched');m1.by='박○○';m1.took='1분 12초';var m2=mk(0,'matched');m2.by='이○○';m2.took='38초';
+    var d1=mk(0,'done');d1.by='최○○';var d2=mk(0,'done');d2.by='나 (김도윤)';d2.me=true;var d3=mk(0,'done');d3.by='강○○';
+    calls=calls.concat([m1,m2,d1,d2,d3]);
+  }
+  var mmss=function(x){return Math.floor(x/60)+':'+String(x%60).padStart(2,'0')};
+  var man=function(n){return (n/10000).toFixed(1).replace('.0','')+'만'};
+  function renderBoard(){
+    var c={new:0,matched:0,done:0};calls.forEach(function(x){c[x.status]++});
+    $('cN').textContent=c.new;$('cM').textContent=c.matched;$('cD').textContent=c.done;$('newCnt').textContent=c.new;
+    if(cur!=='board')return;
+    var list=calls.filter(function(x){return x.status===btab});
+    if(btab==='new')list.sort(function(a,b){return a.left-b.left});
+    $('clist').innerHTML=list.length?list.map(card).join(''):'<p class="boardnote" style="padding:30px 0">'+(btab==='new'?'지금은 대기 중인 호출이 없어요.<br>새 호출이 오면 바로 여기에 떠요.':'아직 없어요.')+'</p>';
+  }
+  function card(x){
+    var t=x.t,h='';
+    if(x.status==='new'){
+      h='<div class="cc new"><div class="r1"><span>'+(t.u?'<span class="pill u">⚡ 긴급</span> ':'')+'<span class="pill n">신규 호출</span>'+(x.bonus?' <span class="pill b">보너스 +5,000원</span>':'')+'</span><span class="tm'+(x.left<60?' low':'')+'">'+mmss(x.left)+'</span></div>'+
+        '<h4>'+t.eq+'</h4><div class="meta">'+t.sym+' · '+t.dong+' '+t.km+'km</div>'+
+        '<div class="r3"><span class="earnv">예상 '+man(t.earn[0])+'~'+man(t.earn[1])+'원<small class="watch">기사님 '+x.watch+'명이 보고 있어요</small></span><button class="grab" data-grab="'+x.id+'">잡기</button></div></div>';
+    }else if(x.status==='matched'){
+      h='<div class="cc'+(x.me?' mine':'')+'"><div class="r1"><span class="pill '+(x.me?'me':'m')+'">'+(x.me?'내가 잡은 콜':'매칭 완료')+'</span><span class="meta">'+t.dong+' '+t.km+'km</span></div><h4>'+t.eq+'</h4><div class="meta">'+t.sym+'</div><div class="who">'+(x.me?'지금 출동 중이에요':x.by+' 기사님이 '+x.took+' 만에 잡았어요')+'</div></div>';
+    }else{
+      h='<div class="cc'+(x.me?' mine':'')+'"><div class="r1"><span class="pill '+(x.me?'me':'d')+'">'+(x.me?'내 완료':'수리 완료')+'</span><span class="meta">'+t.dong+'</span></div><h4>'+t.eq+'</h4><div class="who">'+x.by+' 기사님 · 정산 대기</div></div>';
+    }
+    return h;
+  }
+  $('btabs').querySelectorAll('button').forEach(function(b){b.onclick=function(){btab=b.dataset.t;$('btabs').querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});renderBoard()}});
+  var grabbing=null;
+  $('clist').addEventListener('click',function(e){var g=e.target.closest('[data-grab]');if(!g)return;var x=calls.filter(function(c){return c.id==+g.dataset.grab})[0];if(!x||x.status!=='new'){toast('아쉽게도 다른 기사님이 먼저 잡았어요');return}grabbing=x;openCall()});
+  $('accept').addEventListener('click',function(){if(grabbing){grabbing.status='matched';grabbing.me=true;grabbing=null}});
+  $('decline').addEventListener('click',function(){grabbing=null});
+  setInterval(function(){
+    if(!boardStarted)return;
+    calls.forEach(function(x){
+      if(x.status!=='new'||x===grabbing)return;
+      x.left--;x.age++;
+      if(Math.random()<.25)x.watch=Math.max(1,Math.min(6,x.watch+(Math.random()<.5?-1:1)));
+      if(x.age>25&&Math.random()<0.02){x.status='matched';x.by=OTH[Math.floor(Math.random()*OTH.length)];x.took=mmss(x.age).replace(':','분 ')+'초';if(cur==='board'&&btab==='new')toast(x.t.dong+' 콜을 '+x.by+' 기사님이 잡았어요')}
+      if(x.left<=0){x.left=180;x.bonus=true;x.t=Object.assign({},x.t,{earn:[x.t.earn[0]+5000,x.t.earn[1]+5000]});if(cur==='board')toast('5분 지나서 반경을 넓히고 보너스가 붙었어요')}
+    });
+    if(Math.random()<0.08&&calls.filter(function(x){return x.status==='new'}).length<4){calls.unshift(mk(300));if(cur==='board'){toast('새 호출이 들어왔어요');try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}}
+    renderBoard();
+  },1000);
+  FLOW.board={title:'실시간 콜 현황판',t:'홈으로',next:'home',ok:function(){return true}};
+  BACK.board='home';
+  $('toBoard').onclick=function(){if(!boardStarted){initBoard();boardStarted=true}go('board');renderBoard()};
+
+  // ---- swipe to confirm + undo ----
+  var SWL=['밀어서 현장 도착','밀어서 수리 시작','밀어서 작업 완료'];
+  var UNDO=[null,['현장 도착으로 바꿨어요','5초 뒤 사장님께 "기사님이 도착했어요" 알림이 가요'],['수리 시작으로 바꿨어요','5초 뒤 사장님께 "수리를 시작했어요" 알림이 가요']];
+  var SENT=[null,'사장님께 도착 알림을 보냈어요','사장님께 수리 시작 알림을 보냈어요'];
+  function syncSwipe(){var on=cur==='go';$('swipe').hidden=!on;$('cta').hidden=on;if(on)$('swLabel').textContent=SWL[Math.min(goStage,2)]}
+  var knob=$('knob'),sw=$('swipe'),drag=null,moved=false;
+  function maxX(){return sw.clientWidth-knob.offsetWidth-10}
+  function setX(x){knob.style.transform='translateX('+x+'px)';$('swFill').style.width=(x+30)+'px';sw.querySelector('.lbl').style.opacity=String(1-Math.min(1,x/(maxX()*.7)))}
+  function resetKnob(){knob.classList.add('snap');setX(0);$('swFill').style.width='0';setTimeout(function(){knob.classList.remove('snap')},260)}
+  knob.addEventListener('pointerdown',function(e){drag={x:e.clientX};moved=false;knob.setPointerCapture(e.pointerId);knob.classList.remove('snap')});
+  knob.addEventListener('pointermove',function(e){if(!drag)return;var x=Math.max(0,Math.min(maxX(),e.clientX-drag.x));if(x>4)moved=true;setX(x)});
+  knob.addEventListener('pointerup',function(e){if(!drag)return;var x=Math.max(0,Math.min(maxX(),e.clientX-drag.x));drag=null;
+    if(x>=maxX()*.85){setX(maxX());setTimeout(function(){resetKnob();advance()},150)}
+    else{resetKnob();if(!moved)toast('오른쪽 끝까지 밀어주세요')}});
+  knob.addEventListener('pointercancel',function(){drag=null;resetKnob()});
+  knob.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();advance()}});
+  knob.addEventListener('click',function(e){e.preventDefault()});
+  var undoT=null,prevStage=null;
+  function advance(){
+    prevStage=goStage;goStage++;
+    if(goStage>=3){hideUndo(false);renderGo();return}
+    renderGo();syncSwipe();showUndo(goStage);
+  }
+  function showUndo(stg){
+    clearTimeout(undoT);$('undoTxt').innerHTML=UNDO[stg][0]+'<small>'+UNDO[stg][1]+'</small>';$('undo').hidden=false;
+    var b=$('undoBar');b.classList.remove('run');b.style.width='100%';void b.offsetWidth;b.classList.add('run');
+    undoT=setTimeout(function(){hideUndo(true,stg)},5000);
+  }
+  function hideUndo(sent,stg){clearTimeout(undoT);$('undo').hidden=true;if(sent&&SENT[stg])toast(SENT[stg])}
+  $('undoBtn').onclick=function(){if(prevStage===null)return;goStage=prevStage;prevStage=null;hideUndo(false);renderGo();syncSwipe();toast('되돌렸어요. 사장님께 알림이 가지 않았어요')};
+  var _go3=go;go=function(id){if(id!=='go')hideUndo(false);_go3(id);syncSwipe()};
+
+  // ---- 보험 필수 분야 ----
+  var INS_REQ=['누수 탐지','하수구·배관 막힘','간판 (LED·천갈이·풍선)','전기·차단기'];
+  FLOW.r3.ok=function(){
+    var need=INS_REQ.some(function(e){return st.equip.has(e)});
+    $('insWarn').hidden=!(need&&st.ins==='n');
+    return $('career').value&&st.ins&&!(need&&st.ins==='n');
+  };
+  // 콜판 다양화
+  TPL.splice(0,TPL.length,
+    {eq:'LG 업소용 냉장고',sym:'안 시원해요 · E1',dong:'망원동',km:1.2,earn:[93500,144500],u:true},
+    {eq:'경동나비엔 보일러',sym:'온수가 안 나와요 · 03',dong:'합정동',km:2.4,earn:[59500,127500],u:true},
+    {eq:'주방 천장 누수',sym:'천장에서 물이 떨어져요 · 보험 서류',dong:'서교동',km:0.8,earn:[85000,297500],u:true},
+    {eq:'바닥 배수구 막힘',sym:'역류해요',dong:'연남동',km:3.1,earn:[85000,255000]},
+    {eq:'LED 채널 간판',sym:'글자 2개 꺼짐',dong:'상수동',km:1.9,earn:[68000,170000]},
+    {eq:'분전반 누전',sym:'차단기가 자꾸 내려가요',dong:'성산동',km:2.7,earn:[51000,153000],u:true},
+    {eq:'전동 셔터',sym:'중간에 멈췄어요',dong:'도화동',km:3.4,earn:[68000,170000]},
+    {eq:'고깃집 덕트 환풍기',sym:'안 돌아가요 · 연기 참',dong:'망원동',km:0.7,earn:[68000,212500],u:true},
+    {eq:'손님 화장실 변기',sym:'막혔어요',dong:'합정동',km:1.4,earn:[42500,127500],u:true},
+    {eq:'간판 천갈이',sym:'상호 변경 · 가로 4m',dong:'망원동',km:1.5,earn:[170000,680000]},
+    {eq:'풍선간판',sym:'송풍기 고장 · 안 서요',dong:'서교동',km:1.1,earn:[42500,127500]});
+  // ---- photo ----
+  function setPhoto(html){st.photo=true;$('photoView').innerHTML=html;$('pphoto').classList.add('has');$('homeAv').innerHTML=html;upd()}
+  $('photoIn').onchange=function(){var f=this.files&&this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){setPhoto('<img alt="프로필 사진" src="'+r.result+'">')};r.readAsDataURL(f)};
+  $('samplePhoto').onclick=function(){setPhoto(AVSVG)};
+  $('homeAv').innerHTML=AVSVG;
+  FLOW.r1.ok=function(){return st.photo&&$('name').value.trim()&&st.verified};
+
+  // ---- reviews ----
+  var TAGS={'친절해요':128,'감사해요':104,'설명이 꼼꼼해요':96,'빨리 와주셨어요':81,'가격이 합리적이에요':57};
+  var REVIEWS=[
+    {who:'△△분식 사장님',st:5,tags:['빨리 와주셨어요','감사해요'],txt:'밤늦게 연락했는데도 와주셔서 정말 감사했어요',when:'10월 1일'},
+    {who:'□□카페 사장님',st:5,tags:['친절해요','설명이 꼼꼼해요'],txt:'고장 원인을 쉽게 설명해주셔서 좋았어요',when:'10월 2일'}];
+  var count=214;
+  function renderReviews(){
+    var max=Math.max.apply(null,Object.keys(TAGS).map(function(k){return TAGS[k]}));
+    $('tagBars').innerHTML=Object.keys(TAGS).sort(function(a,b){return TAGS[b]-TAGS[a]}).map(function(k){return '<div class="tbar"><span>'+k+'</span><i><b style="width:'+(TAGS[k]/max*100)+'%"></b></i><span>'+TAGS[k]+'</span></div>'}).join('');
+    $('rvCount').textContent='리뷰 '+count+'개';
+    $('rvList').innerHTML=REVIEWS.map(function(r){return '<div class="rvi"><div class="h"><span>'+r.who+(r.isNew?'<span class="new-tag">NEW</span>':'')+'</span><span><b>'+'★'.repeat(r.st)+'</b> · '+r.when+'</span></div>“'+r.txt+'”<div class="tg">'+r.tags.map(function(t){return '<span>'+t+'</span>'}).join('')+'</div></div>'}).join('');
+  }
+  renderReviews();
+  var _go=go;go=function(id){
+    if(id==='home'&&st.newJob&&!st.reviewed){
+      st.reviewed=true;count++;TAGS['친절해요']++;TAGS['감사해요']++;
+      REVIEWS.forEach(function(r){r.isNew=false});
+      REVIEWS.unshift({who:'○○식당 사장님',st:5,tags:['친절해요','감사해요'],txt:'급한 상황이었는데 부품까지 챙겨 와서 바로 고쳐주셨어요',when:'방금 전',isNew:true});
+      renderReviews();setTimeout(function(){toast('○○식당 사장님이 ★5 평가를 남겼어요')},400);
+    }
+    if(id==='home'&&!st.newJob)st.reviewed=false;
+    _go(id);
+  };
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&$('call').classList.contains('open'))$('decline').click()});
+  go('intro');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>찍꼬 – 찍고 보내면 기사님이 옵니다</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#EEF0F3; --surface:#FFFFFF; --ink:#16181C; --muted:#6B717A; --line:#E1E4E8; --chip:#F5F6F8;
+  --brand:#17191D; --brand-2:#23262C; --on-brand:#F5F3EF; --on-brand-muted:#A3A8B0;
+  --orange:#FF6B00; --orange-2:#FF8A2B; --orange-soft:#FFF0E5; --orange-line:#FFC9A1;
+  --ok:#15895A; --ok-soft:#E3F5EC; --warn:#D9381E; --warn-soft:#FDE7E2;
+  --shadow:0 1px 2px rgba(20,22,26,.06),0 6px 20px rgba(20,22,26,.06);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#0E1012; --surface:#1A1D21; --ink:#F2F0EC; --muted:#9AA0A8; --line:#2C3036; --chip:#22262B;
+    --brand:#17191D; --brand-2:#202328;
+    --orange-soft:#2E1C10; --orange-line:#6A3A16; --ok-soft:#10291E; --warn-soft:#331610;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --page:#0E1012; --surface:#1A1D21; --ink:#F2F0EC; --muted:#9AA0A8; --line:#2C3036; --chip:#22262B;
+  --brand:#17191D; --brand-2:#202328;
+  --orange-soft:#2E1C10; --orange-line:#6A3A16; --ok-soft:#10291E; --warn-soft:#331610;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:var(--page);color:var(--ink);
+  font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none;letter-spacing:inherit}
+button:focus-visible,label:focus-within,textarea:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+svg.i{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.app{max-width:460px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+
+/* wordmark */
+.mark{display:inline-flex;align-items:center;gap:8px;font-family:"Outfit","IBM Plex Sans KR",sans-serif;font-weight:800;letter-spacing:-0.02em;line-height:1}
+.mark .en{font-size:24px}
+.mark .lens{display:inline-block;width:.78em;height:.78em;border-radius:50%;border:.16em solid var(--orange);position:relative;top:.02em;margin-left:.04em}
+.mark .lens::after{content:"";position:absolute;width:.18em;height:.18em;border-radius:50%;background:var(--orange);top:-.28em;right:-.28em}
+.mark .ko{font-family:"IBM Plex Sans KR",sans-serif;font-weight:700;font-size:15px;color:var(--orange);letter-spacing:0}
+
+/* top bar for steps */
+.top{display:flex;align-items:center;gap:10px;padding:12px 16px 8px}
+.top .back{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--surface);box-shadow:var(--shadow)}
+.top .title{font-weight:700;font-size:16px;flex:1}
+.top .count{font-size:13px;font-weight:600;color:var(--muted)}
+.progress{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:2px 16px 10px}
+.progress span{height:4px;border-radius:2px;background:var(--line);transition:background .3s}
+.progress span.on{background:var(--orange)}
+
+main{flex:1;padding:0 16px 150px}
+.screen{display:none}
+.screen.on{display:block;animation:in .28s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+@media (prefers-reduced-motion: reduce){.screen.on{animation:none}}
+
+h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacing:-0.03em}
+.lead{color:var(--muted);margin:0 0 16px;font-size:15px}
+
+/* ===== HOME ===== */
+#s-home{margin:0 -16px}
+.hero{background:radial-gradient(120% 70% at 85% 10%,#2C2218 0%,transparent 60%),linear-gradient(180deg,var(--brand-2),var(--brand));color:var(--on-brand);padding:18px 20px 26px;border-radius:0 0 30px 30px;position:relative;overflow:hidden}
+.hero .bell{position:absolute;right:18px;top:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.07);display:grid;place-items:center;color:var(--on-brand)}
+.hero h1{font-size:31px;line-height:1.28;margin:26px 0 8px;font-weight:700;letter-spacing:-0.04em}
+.hero p{color:var(--on-brand-muted);margin:0 0 22px;font-size:15px}
+.hero .fridge{position:absolute;right:-18px;top:70px;width:150px;opacity:.9}
+.shoot-cta{display:flex;align-items:center;gap:16px;width:100%;text-align:left;padding:18px;border-radius:22px;
+  background:linear-gradient(135deg,var(--orange-2),var(--orange) 55%,#E85A00);color:#fff;
+  box-shadow:0 10px 30px rgba(255,107,0,.35),inset 0 1px 0 rgba(255,255,255,.25);position:relative;z-index:1}
+.shoot-cta .cam{width:58px;height:58px;border-radius:18px;background:#fff;color:var(--orange);display:grid;place-items:center;flex:none}
+.shoot-cta .cam svg{width:30px;height:30px}
+.shoot-cta b{font-size:20px;display:block;letter-spacing:-0.03em}
+.shoot-cta small{opacity:.88;font-size:13.5px}
+.steps-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px;position:relative;z-index:1}
+.steps-mini div{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 4px;text-align:center;font-size:12px;color:var(--on-brand-muted)}
+.steps-mini div b{display:block;color:var(--orange-2);font-family:"Outfit",sans-serif;font-size:15px;margin-bottom:2px}
+
+.section{padding:22px 16px 0}
+.section h3{font-size:17px;margin:0 0 12px;letter-spacing:-0.02em}
+.why{display:grid;gap:10px}
+.why div{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.why .ic{width:42px;height:42px;border-radius:13px;background:var(--orange-soft);color:var(--orange);display:grid;place-items:center;flex:none}
+.why b{display:block;font-size:15.5px}
+.why small{color:var(--muted);font-size:13.5px;line-height:1.5;display:block;margin-top:2px}
+.sticker{margin:12px 0 0;border-radius:18px;padding:16px;display:flex;gap:14px;align-items:center;background:var(--surface);box-shadow:var(--shadow);border:1.5px dashed var(--orange-line)}
+.sticker .qr{width:54px;height:54px;flex:none;border-radius:10px;padding:6px;background:#fff;border:1px solid #ddd}
+.sticker p{margin:0;font-size:13.5px;color:var(--muted)}
+.sticker b{color:var(--ink);display:block;font-size:15px}
+
+/* ===== CAMERA STEPS ===== */
+.finder{position:relative;aspect-ratio:4/3.3;border-radius:24px;overflow:hidden;background:linear-gradient(160deg,#2A2E34,#15171A);margin-bottom:12px;box-shadow:var(--shadow)}
+.finder .shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.finder .ghost{position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,.18)}
+.finder .ghost svg{width:46%;height:auto}
+.finder .corners{position:absolute;inset:18px;pointer-events:none}
+.finder .corners i{position:absolute;width:30px;height:30px;border:3.5px solid var(--orange)}
+.finder .corners i:nth-child(1){top:0;left:0;border-right:0;border-bottom:0;border-radius:12px 0 0 0}
+.finder .corners i:nth-child(2){top:0;right:0;border-left:0;border-bottom:0;border-radius:0 12px 0 0}
+.finder .corners i:nth-child(3){bottom:0;left:0;border-right:0;border-top:0;border-radius:0 0 0 12px}
+.finder .corners i:nth-child(4){bottom:0;right:0;border-left:0;border-top:0;border-radius:0 0 12px 0}
+.finder .hint{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);color:#fff;font-weight:600;font-size:13.5px;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);padding:6px 14px;border-radius:999px;white-space:nowrap}
+.finder .scan{position:absolute;left:18px;right:18px;height:2px;background:var(--orange);box-shadow:0 0 16px 3px rgba(255,107,0,.8);top:18px;animation:scan 1.3s ease-in-out infinite alternate;display:none}
+.finder.scanning .scan{display:block}
+.finder .ai{position:absolute;top:16px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:6px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:#fff;font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px}
+.finder.scanning .ai{display:flex}
+.finder .ai::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--orange);animation:blink .8s infinite alternate}
+@keyframes scan{to{top:calc(100% - 20px)}}
+@keyframes blink{to{opacity:.2}}
+@media (prefers-reduced-motion: reduce){.finder .scan{animation:none;top:50%}.finder .ai::before{animation:none}}
+
+.camrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 4px 12px}
+.side{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600;min-width:72px;padding:6px 0;border-radius:12px}
+.side .sq{width:44px;height:44px;border-radius:14px;background:var(--surface);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--ink)}
+.shutter{width:76px;height:76px;border-radius:50%;border:4px solid var(--orange);display:grid;place-items:center;position:relative;cursor:pointer}
+.shutter::after{content:"";width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--orange-2),var(--orange));box-shadow:0 4px 14px rgba(255,107,0,.4)}
+.shutter input{position:absolute;width:1px;height:1px;opacity:0}
+.skipline{display:block;width:100%;text-align:center;color:var(--muted);font-size:14px;font-weight:600;padding:8px;text-decoration:underline;text-underline-offset:4px}
+
+.readout{background:var(--surface);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);margin-top:4px}
+.readhead{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--ok);margin-bottom:6px;font-size:14.5px}
+.readhead .ck{width:22px;height:22px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center}
+.readhead .ck svg{width:14px;height:14px;stroke-width:3}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:15px}
+.kv span{color:var(--muted)}
+.kv b{text-align:right;font-weight:600}
+.demo-note{font-size:12px;color:var(--muted);margin:8px 2px 0}
+
+/* ===== SYMPTOMS ===== */
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chip{background:var(--surface);border:1.5px solid transparent;box-shadow:var(--shadow);border-radius:18px;padding:14px;text-align:left;display:flex;gap:10px;align-items:center;min-height:64px;transition:border-color .15s,background .15s}
+.chip .ic{width:36px;height:36px;border-radius:11px;background:var(--chip);display:grid;place-items:center;color:var(--muted);flex:none;transition:all .15s}
+.chip b{font-size:14.5px;font-weight:600;line-height:1.3}
+.chip[aria-pressed="true"]{border-color:var(--orange);background:var(--orange-soft)}
+.chip[aria-pressed="true"] .ic{background:var(--orange);color:#fff}
+textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:14px 16px;font:inherit;font-size:15px;resize:vertical}
+
+/* ===== SUMMARY ===== */
+.card{background:var(--surface);border-radius:20px;padding:16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.card .lab{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.equip{display:flex;gap:12px;align-items:center}
+.equip .ph{width:64px;height:64px;border-radius:14px;overflow:hidden;flex:none;background:#222}
+.equip .ph > *{width:100%;height:100%;object-fit:cover;display:block}
+.equip b{font-size:16.5px;display:block}
+.equip small{color:var(--muted);font-size:13.5px}
+.thumbs{display:flex;gap:6px;margin-top:12px}
+.thumbs div{width:44px;height:44px;border-radius:10px;overflow:hidden;background:#222}
+.thumbs div > *{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs .none{background:var(--chip);display:grid;place-items:center;font-size:10.5px;color:var(--muted);text-align:center;line-height:1.2}
+.badge{display:inline-flex;align-items:center;gap:5px;font-weight:700;font-size:13px;padding:5px 11px;border-radius:999px}
+.badge svg{width:15px;height:15px}
+.badge.urgent{background:var(--warn-soft);color:var(--warn)}
+.badge.normal{background:var(--ok-soft);color:var(--ok)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{background:var(--chip);border-radius:9px;padding:5px 10px;font-size:13.5px;font-weight:500}
+.causes{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.causes li{display:flex;gap:10px;align-items:center;font-size:15px}
+.causes li i{font-style:normal;width:24px;height:24px;border-radius:8px;background:var(--orange-soft);color:var(--orange);display:grid;place-items:center;font-size:12.5px;font-weight:700;flex:none;font-family:"Outfit",sans-serif}
+.pricecard{background:linear-gradient(180deg,var(--brand-2),var(--brand));color:var(--on-brand)}
+.pricecard .lab{color:var(--on-brand-muted)}
+.price{font-family:"Outfit",sans-serif;font-weight:800;font-size:30px;letter-spacing:-0.02em;line-height:1.1}
+.price span{font-family:"IBM Plex Sans KR",sans-serif;font-size:16px;font-weight:600;margin-left:2px}
+.pricecard small{display:block;color:var(--on-brand-muted);font-size:13px;margin-top:8px}
+
+/* ===== MATCHING ===== */
+.radar{position:relative;width:240px;height:240px;margin:36px auto 18px}
+.radar .ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--orange);opacity:0;animation:ping 2.4s ease-out infinite}
+.radar .ring:nth-child(2){animation-delay:.8s}.radar .ring:nth-child(3){animation-delay:1.6s}
+.radar .grid{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 32%,var(--line) 32.5%,transparent 33.5%,transparent 65%,var(--line) 65.5%,transparent 66.5%)}
+.radar .core{position:absolute;inset:88px;border-radius:50%;background:linear-gradient(135deg,var(--orange-2),var(--orange));display:grid;place-items:center;color:#fff;box-shadow:0 8px 24px rgba(255,107,0,.45)}
+.radar .core svg{width:30px;height:30px}
+.radar .pin{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--ink);border:2.5px solid var(--surface);opacity:0;animation:pop .4s forwards}
+@keyframes ping{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1);opacity:0}}
+@keyframes pop{to{opacity:1}}
+@media (prefers-reduced-motion: reduce){.radar .ring{animation:none;opacity:.25}}
+.center{text-align:center}
+.found{margin:16px auto 0;max-width:320px;display:grid;gap:8px;text-align:left}
+.found div{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted);background:var(--surface);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);animation:in .3s ease-out}
+.found div svg{width:18px;height:18px;color:var(--ok);stroke-width:2.6}
+
+/* ===== MATCHED ===== */
+.mapwrap{position:relative;border-radius:24px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:-36px}
+.mapwrap svg{display:block;width:100%;height:auto}
+.etapill{position:absolute;top:14px;left:14px;background:var(--brand);color:var(--on-brand);border-radius:999px;padding:7px 14px;font-size:13.5px;font-weight:600;display:flex;gap:6px;align-items:center}
+.etapill b{color:var(--orange-2);font-family:"Outfit",sans-serif;font-size:16px}
+.techcard{position:relative;margin:0 10px 10px;background:var(--surface);border-radius:22px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.14)}
+.tech{display:flex;gap:12px;align-items:center}
+.avatar{width:56px;height:56px;border-radius:50%;overflow:hidden;flex:none;background:var(--orange-soft)}
+.tech b{font-size:17px;display:block}
+.tech small{color:var(--muted);font-size:13px}
+.stars{color:var(--orange);font-weight:700;font-size:13.5px}
+.carry{display:flex;gap:8px;align-items:center;background:var(--ok-soft);color:var(--ok);border-radius:14px;padding:11px 13px;font-weight:600;font-size:14px;margin-top:12px}
+.carry svg{width:18px;height:18px;flex:none}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;border-radius:15px;font-weight:600;font-size:15.5px;padding:0 14px}
+.btn.soft{background:var(--chip)}
+.btn.primary{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#fff;box-shadow:0 8px 22px rgba(255,107,0,.3)}
+.btn.primary:disabled{background:var(--line);color:var(--muted);box-shadow:none;cursor:not-allowed}
+.timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);text-align:center;font-size:12px;color:var(--muted);position:relative}
+.timeline li{position:relative;padding-top:24px}
+.timeline li::before{content:"";position:absolute;top:4px;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:var(--surface);border:2.5px solid var(--line);z-index:1}
+.timeline li::after{content:"";position:absolute;top:10px;left:-50%;width:100%;height:2.5px;background:var(--line)}
+.timeline li:first-child::after{display:none}
+.timeline li.done{color:var(--ink);font-weight:600}
+.timeline li.done::before{background:var(--orange);border-color:var(--orange)}
+.timeline li.done::after{background:var(--orange)}
+.timeline li.now::before{box-shadow:0 0 0 5px var(--orange-soft)}
+.linkbtn{display:block;width:100%;text-align:center;color:var(--muted);font-size:14px;font-weight:600;padding:12px;text-decoration:underline;text-underline-offset:4px}
+
+/* bottom bar */
+.bar{position:fixed;left:0;right:0;bottom:0;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--page) 72%,transparent)}
+.bar .inner{max-width:428px;margin:0 auto}
+.bar .btn{width:100%;min-height:58px;font-size:17px;border-radius:18px}
+
+/* tech sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;z-index:10}
+.sheet-bg.open{display:flex}
+.sheet{background:var(--page);width:100%;max-width:460px;max-height:90%;overflow:auto;border-radius:26px 26px 0 0;padding:12px 16px calc(20px + env(safe-area-inset-bottom,0px));animation:up .3s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:.5}}
+.sheet .grab{width:42px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
+.techapp{background:var(--brand);color:var(--on-brand);border-radius:22px;overflow:hidden}
+.techapp .hd{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#fff;font-weight:700}
+.techapp .hd small{font-weight:600;opacity:.9}
+.techapp .bd{padding:4px 16px 16px}
+.techapp .r{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14.5px}
+.techapp .r:last-child{border-bottom:0}
+.techapp .r span{width:72px;flex:none;color:var(--on-brand-muted)}
+.techapp .r b{font-weight:600}
+.techapp .r b.o{color:var(--orange-2)}
+.techapp .ft{display:grid;grid-template-columns:1fr 2fr;gap:8px;padding:0 16px 16px}
+.techapp .ft div{border-radius:14px;min-height:48px;display:grid;place-items:center;font-weight:700;font-size:15px}
+.techapp .ft .no{background:rgba(255,255,255,.08);color:var(--on-brand-muted)}
+.techapp .ft .yes{background:var(--ok);color:#fff}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ===== REVIEW ===== */
+.rv-av{width:84px;height:84px;border-radius:50%;overflow:hidden;margin:18px auto 10px;box-shadow:var(--shadow)}
+.rv-av svg{width:100%;height:100%;display:block}
+.starrow{display:flex;justify-content:center;gap:6px;margin:6px 0 2px}
+.starrow button{width:52px;height:52px;display:grid;place-items:center;border-radius:12px}
+.starrow svg{width:44px;height:44px;fill:var(--line);stroke:none;transition:fill .15s,transform .15s}
+.starrow button.on svg{fill:var(--orange)}
+.starrow button:active svg{transform:scale(.9)}
+.starlabel{text-align:center;font-weight:700;color:var(--orange);min-height:24px;margin:0 0 18px}
+.qlab{font-size:14px;font-weight:600;margin:0 0 10px}
+.qtags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.qtags button{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 14px;font-size:14.5px;font-weight:500}
+.qtags button[aria-pressed="true"]{border-color:var(--orange);background:var(--orange-soft);color:var(--orange);font-weight:600}
+.oneline{width:100%;min-height:54px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:0 16px;font:inherit;font-size:15.5px}
+.oneline:focus{outline:none;border-color:var(--orange)}
+.cnt{display:block;text-align:right;font-size:12.5px;color:var(--muted);margin-top:6px}
+.rvcard{background:var(--surface);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-top:10px}
+.rvcard .st{color:var(--orange);font-size:18px;letter-spacing:2px}
+.rvcard .tg{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.rvcard .tg span{background:var(--orange-soft);color:var(--orange);border-radius:9px;padding:4px 10px;font-size:13px;font-weight:600}
+.rvcard q{display:block;font-size:15px}
+.praise{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.praise span{background:var(--chip);border-radius:9px;padding:5px 10px;font-size:13px;font-weight:500}
+.praise b{color:var(--orange);margin-left:3px}
+.lastrv{margin-top:10px;font-size:14px;color:var(--muted);border-left:3px solid var(--orange-line);padding-left:10px}
+.okbig{width:84px;height:84px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;margin:30px auto 14px;box-shadow:0 10px 30px rgba(21,137,90,.35)}
+.okbig svg{width:40px;height:40px;stroke-width:2.6}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ===== LOCAL PROS ===== */
+.localbtn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--surface);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:22px}
+.avstack{display:flex;flex:none}
+.avstack span{width:38px;height:38px;border-radius:50%;overflow:hidden;border:2.5px solid var(--surface);margin-left:-10px}
+.avstack span:first-child{margin-left:0}
+.avstack svg{width:100%;height:100%;display:block}
+.localbtn b{display:block;font-size:16px}
+.localbtn small{color:var(--muted);font-size:13px}
+.localbtn .arr{margin-left:auto;color:var(--orange)}
+.areabar{display:flex;justify-content:space-between;align-items:center;margin:4px 0 12px}
+.areabar b{font-size:20px;letter-spacing:-0.03em}
+.areabar select{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 10px;font-size:14px}
+.flt{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;scrollbar-width:none}
+.flt button{flex:none;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 13px;font-size:14px;font-weight:500}
+.flt button[aria-pressed="true"]{background:var(--ink);color:var(--page);border-color:var(--ink);font-weight:600}
+.plist{display:grid;gap:10px}
+.pcard{display:flex;gap:12px;background:var(--surface);border-radius:20px;padding:14px;box-shadow:var(--shadow);text-align:left;width:100%;position:relative}
+.pcard .pav{width:64px;height:64px;border-radius:18px;overflow:hidden;flex:none}
+.pcard .pav svg{width:100%;height:100%;display:block}
+.pcard .bd{flex:1;min-width:0}
+.pcard .nm{font-weight:700;font-size:16px}
+.pcard .meta{font-size:13px;color:var(--muted)}
+.pcard .meta .st{color:var(--orange);font-weight:700}
+.bdg{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
+.bdg span{font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 7px;background:var(--chip);color:var(--muted)}
+.bdg .f{background:var(--orange-soft);color:var(--orange)}
+.bdg .n{background:#E6F0FF;color:#2F64C7}
+.bdg .s{background:var(--ok-soft);color:var(--ok)}
+.heart{position:absolute;top:10px;right:10px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.heart svg{width:22px;height:22px}
+.heart[aria-pressed="true"]{color:#E5484D}
+.heart[aria-pressed="true"] svg{fill:#E5484D}
+.emptymsg{text-align:center;color:var(--muted);padding:30px 0;font-size:14.5px}
+.prohd{text-align:center;padding-top:6px}
+.prohd .pav{width:96px;height:96px;border-radius:28px;overflow:hidden;margin:0 auto 10px;box-shadow:var(--shadow)}
+.prohd .pav svg{width:100%;height:100%;display:block}
+.prohd .bdg{justify-content:center}
+.pstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 4px}
+.pstats div{background:var(--surface);border-radius:16px;padding:12px 6px;text-align:center;box-shadow:var(--shadow)}
+.pstats b{display:block;font-family:"Outfit",sans-serif;font-size:20px}
+.pstats small{color:var(--muted);font-size:12px}
+.tbar{display:grid;grid-template-columns:108px 1fr 30px;gap:10px;align-items:center;font-size:13.5px;margin:7px 0}
+.tbar i{display:block;height:8px;border-radius:4px;background:var(--chip);overflow:hidden}
+.tbar i b{display:block;height:100%;background:var(--orange);border-radius:4px}
+.tbar span:last-child{text-align:right;font-weight:600}
+.rvi{border-top:1px solid var(--line);padding:12px 0 2px;font-size:14.5px}
+.rvi .h{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:3px}
+.rvi .h b{color:var(--orange);letter-spacing:1px}
+.prefnote{background:var(--orange-soft);border-radius:14px;padding:12px 14px;font-size:13.5px;margin-top:10px}
+[hidden]{display:none!important}
+
+.catgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cat{display:flex;flex-direction:column;align-items:flex-start;gap:8px;background:var(--surface);border-radius:18px;padding:14px;box-shadow:var(--shadow);text-align:left;border:1.5px solid transparent;min-height:104px}
+.cat .ic{width:40px;height:40px;border-radius:12px;background:var(--orange-soft);color:var(--orange);display:grid;place-items:center}
+.cat b{font-size:15.5px;line-height:1.25}
+.cat small{color:var(--muted);font-size:12.5px;line-height:1.35;margin-top:-4px}
+.cat:active{border-color:var(--orange)}
+.catpill{display:inline-flex;align-items:center;gap:6px;background:var(--orange-soft);color:var(--orange);font-weight:700;font-size:13px;border-radius:999px;padding:5px 11px;margin-bottom:6px}
+.catpill svg{width:15px;height:15px}
+.inscard{border:1.5px solid var(--orange-line)}
+.inscard .yn{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.inscard .yn button{min-height:46px;border-radius:13px;background:var(--chip);font-weight:600}
+.inscard .yn button[aria-pressed="true"]{background:var(--orange);color:#fff}
+.inscard p{margin:10px 0 0;font-size:13.5px;color:var(--muted)}
+.docs{display:grid;gap:8px;margin-top:10px}
+.docs button{display:flex;align-items:center;gap:10px;background:var(--chip);border-radius:13px;padding:12px 14px;font-weight:600;font-size:14.5px;text-align:left}
+.docs button svg{color:var(--orange)}
+.safety{background:var(--warn-soft);color:var(--warn);border-radius:16px;padding:14px 16px;font-size:14px;font-weight:600;margin-top:12px;line-height:1.5}
+.safety.info{background:var(--orange-soft);color:var(--ink);font-weight:500}
+.safety.info b{color:var(--orange)}
+.safety b{display:block;font-size:15.5px;margin-bottom:2px}
+
+/* ===== OTHER SERVICES ===== */
+.svcgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.svc{background:var(--surface);border-radius:18px;padding:14px 10px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.svc .ic{width:44px;height:44px;border-radius:14px;background:var(--chip);display:grid;place-items:center;color:var(--ink)}
+.svc b{font-size:14px;line-height:1.25}
+.svc small{font-size:11.5px;color:var(--muted);line-height:1.3}
+.seg2{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--chip);border-radius:14px;padding:4px;gap:4px;margin-bottom:14px}
+.seg2 button{min-height:42px;border-radius:11px;font-weight:600;font-size:14px;color:var(--muted)}
+.seg2 button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.fld{margin-bottom:16px}
+.fld > .ql{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.inp2{width:100%;min-height:50px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:0 14px;font:inherit;font-size:15.5px}
+.inp2:focus{outline:none;border-color:var(--orange)}
+.phrow{display:flex;gap:8px;flex-wrap:wrap}
+.phrow .ph{width:76px;height:76px;border-radius:14px;overflow:hidden;background:#222}
+.phrow .ph svg{width:100%;height:100%;display:block}
+.phrow .add{width:76px;height:76px;border-radius:14px;border:1.5px dashed var(--line);display:grid;place-items:center;color:var(--muted);background:var(--surface);cursor:pointer;position:relative}
+.phrow .add input{position:absolute;width:1px;height:1px;opacity:0}
+.qc{background:var(--surface);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:10px;border:1.5px solid transparent}
+.qc.best{border-color:var(--orange-line)}
+.qc .top{display:flex;gap:12px;align-items:center}
+.qc .logo{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px;flex:none}
+.qc .nm{font-weight:700;font-size:16px}
+.qc .meta{font-size:13px;color:var(--muted)}
+.qc .price{font-family:"Outfit",sans-serif;font-weight:800;font-size:26px;margin-top:10px}
+.qc .price span{font-family:"IBM Plex Sans KR",sans-serif;font-size:14px;font-weight:600}
+.qc ul{margin:8px 0 0;padding-left:18px;font-size:14px;color:var(--muted)}
+.qc q{display:block;margin-top:10px;font-size:14px;background:var(--chip);border-radius:12px;padding:10px 12px}
+.qc .acts2{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin-top:12px}
+.qc .acts2 button{min-height:46px;border-radius:13px;font-weight:600;font-size:14.5px}
+.qc .acts2 .a{background:var(--chip)}
+.qc .acts2 .b{background:var(--orange);color:#fff}
+.flag{font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 7px;background:var(--orange-soft);color:var(--orange);margin-left:6px;vertical-align:2px}
+.ugrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.uc{background:var(--surface);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column}
+.uc .im{aspect-ratio:1.15;display:grid;place-items:center;position:relative}
+.uc .im svg{width:46%;height:auto;color:#fff;stroke-width:1.4}
+.uc .gr{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.55);color:#fff;font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 7px}
+.uc .bd2{padding:10px 12px 12px}
+.uc b{font-size:14px;line-height:1.3;display:block}
+.uc .pr{font-family:"Outfit",sans-serif;font-weight:800;font-size:17px;margin-top:4px}
+.uc small{font-size:12px;color:var(--muted)}
+.uc .ok{font-size:11.5px;font-weight:700;color:var(--ok)}
+.uhero{aspect-ratio:1.5;border-radius:22px;display:grid;place-items:center;margin-bottom:12px}
+.uhero svg{width:34%;height:auto;color:#fff;stroke-width:1.3}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:34px;height:34px;border-radius:10px;background:var(--chip);font-weight:700;font-size:18px}
+.stepper span{min-width:22px;text-align:center;font-weight:700}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.mrow:last-child{border-bottom:0}
+.tgl{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.tgl:last-child{border-bottom:0}
+.tgl b{display:block;font-size:15px}
+.tgl small{color:var(--muted);font-size:13px}
+.sw2{width:52px;height:30px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .2s}
+.sw2::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw2[aria-pressed="true"]{background:var(--orange)}
+.sw2[aria-pressed="true"]::after{transform:translateX(22px)}
+.linkcard{display:flex;gap:10px;align-items:center;background:var(--orange-soft);border-radius:14px;padding:12px 14px;margin-top:12px;font-size:14px;width:100%;text-align:left}
+.linkcard b{color:var(--orange)}
+
+.lmap{position:relative;border-radius:22px;overflow:hidden;box-shadow:var(--shadow);aspect-ratio:1/1.12;background:#E8EAED;margin-bottom:10px}
+.lmap svg.base{position:absolute;inset:0;width:100%;height:100%}
+.mpin{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:0;padding:0;cursor:pointer;z-index:2}
+.mpin .av{width:42px;height:42px;border-radius:50%;overflow:hidden;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.mpin .av svg{width:100%;height:100%;display:block}
+.mpin.fav .av{border-color:var(--orange)}
+.mpin.sel .av{border-color:var(--orange);transform:scale(1.15)}
+.mpin .nm{font-size:11.5px;font-weight:700;background:#fff;color:#16181C;border-radius:8px;padding:1px 6px;box-shadow:0 1px 4px rgba(0,0,0,.15);white-space:nowrap}
+.mpin .st{color:var(--orange)}
+.me{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.me i{width:18px;height:18px;border-radius:50%;background:#17191D;border:3px solid #fff;box-shadow:0 0 0 6px rgba(23,25,29,.15)}
+.me span{font-size:11px;font-weight:700;background:#17191D;color:#fff;border-radius:7px;padding:1px 6px}
+.zone{position:absolute;border-radius:50%;border:2px dashed var(--orange);background:rgba(255,107,0,.08);transform:translate(-50%,-50%);pointer-events:none;z-index:0}
+.mapsrc{position:absolute;right:8px;bottom:8px;font-size:10.5px;background:rgba(255,255,255,.85);color:#555;border-radius:6px;padding:2px 6px}
+.selcard{display:flex;gap:12px;align-items:center;background:var(--surface);border-radius:20px;padding:12px 14px;box-shadow:var(--shadow);width:100%;text-align:left}
+.selcard .pav{width:52px;height:52px;border-radius:15px;overflow:hidden;flex:none}
+.selcard .pav svg{width:100%;height:100%;display:block}
+.selcard b{font-size:15.5px}
+.selcard small{color:var(--muted);font-size:13px;display:block}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h2l1.6-2h5.8l1.6 2h2A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.8"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 7.5 2.8C19.5 15.4 12 20 12 20z"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21c-4 0-6.5-2.7-6.5-6.3 0-3.6 3-5.7 3.5-9.2 2 1.4 3 3 3.2 4.7.9-.6 1.5-1.7 1.6-3 2.4 2 4.7 4.6 4.7 7.6 0 3.6-2.5 6.2-6.5 6.2z"/></symbol>
+  <symbol id="i-sign" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="10" rx="2"/><path d="M7 15v5M17 15v5M7 9.5h10"/></symbol>
+  <symbol id="i-pipe" viewBox="0 0 24 24"><path d="M3 8h9a3 3 0 0 1 3 3v10M3 12h7a1 1 0 0 1 1 1v8"/><path d="M15 21h4"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0zM12 17v4"/></symbol>
+  <symbol id="i-shutter" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1.5"/><path d="M3 8h18M3 12h18M3 16h18"/></symbol>
+  <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 9h12a3 3 0 1 0-3-3M3 15h15a3 3 0 1 1-3 3M3 12h9"/></symbol>
+  <symbol id="i-ice" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="8.5" y="13" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-fan" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.3"/><path d="M12 10.7c0-3 .8-5 3.2-5.6M13.3 12c3 0 5 .8 5.6 3.2M12 13.3c0 3-.8 5-3.2 5.6M10.7 12c-3 0-5-.8-5.6-3.2"/></symbol>
+  <symbol id="i-toilet" viewBox="0 0 24 24"><path d="M6 3h6v7H6z"/><path d="M4 10h16a7 7 0 0 1-7 7h-1l.6 4H8.4l.9-4.6A7 7 0 0 1 4 10z"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L4 16.8 7.2 20l5.3-5.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.5-.5-.5-2.5z"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/></symbol>
+  <symbol id="i-won" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7.5 8.5l2 7 2.5-6 2.5 6 2-7M7 12h10"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h3.5l1.5 4-2 1.5a11 11 0 0 0 6.5 6.5l1.5-2 4 1.5V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
+  <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M10 13.5V5a2 2 0 0 1 4 0v8.5a4 4 0 1 1-4 0z"/><path d="M12 9v7"/></symbol>
+  <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v8M7 6.3a7.5 7.5 0 1 0 10 0"/></symbol>
+  <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2v20M4.5 6.5l15 11M19.5 6.5l-15 11M9 4l3 2 3-2M9 20l3-2 3 2"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6.5 7 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 10 12 3 12 3z"/></symbol>
+  <symbol id="i-door" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M15 11v2"/></symbol>
+  <symbol id="i-frost" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16M8 4l-2 4 2 4-2 4 2 4M16 4l-2 4 2 4-2 4 2 4"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.8 1c0 1.7-2.3 2-2.3 3.5M12 17.2v.1"/></symbol>
+  <symbol id="i-img" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 9"/></symbol>
+  <symbol id="i-fridge" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M5 10h14M8.5 6v2M8.5 13v3"/></symbol>
+</svg>
+
+<div class="app">
+  <div id="stepHead" hidden>
+    <header class="top">
+      <button class="back" id="backBtn" aria-label="뒤로"><svg class="i"><use href="#i-back"/></svg></button>
+      <span class="title" id="stepTitle"></span>
+      <span class="count" id="stepCount"></span>
+    </header>
+    <div class="progress" id="progress"><span></span><span></span><span></span><span></span></div>
+  </div>
+
+  <main>
+    <!-- HOME -->
+    <section class="screen on" id="s-home">
+      <div class="hero">
+        <span class="mark"><span class="en">JIKK<span class="lens"></span></span><span class="ko">찍꼬</span></span>
+        <span class="bell"><svg class="i"><use href="#i-bell"/></svg></span>
+        <svg class="fridge" viewBox="0 0 150 200" aria-hidden="true">
+          <defs><linearGradient id="st" x1="0" x2="1"><stop offset="0" stop-color="#5B6068"/><stop offset=".5" stop-color="#8F959D"/><stop offset="1" stop-color="#4A4F56"/></linearGradient></defs>
+          <rect x="18" y="8" width="120" height="186" rx="8" fill="url(#st)" opacity=".55"/>
+          <rect x="22" y="12" width="56" height="178" rx="4" fill="#fff" opacity=".06"/>
+          <rect x="82" y="12" width="52" height="178" rx="4" fill="#fff" opacity=".03"/>
+          <rect x="70" y="70" width="4" height="40" rx="2" fill="#fff" opacity=".35"/>
+          <rect x="86" y="70" width="4" height="40" rx="2" fill="#fff" opacity=".35"/>
+          <rect x="96" y="22" width="30" height="13" rx="3" fill="#0d1410"/>
+          <text x="111" y="32" font-size="9" text-anchor="middle" fill="#FF6B00" font-family="monospace" font-weight="700">E1</text>
+        </svg>
+        <h1>매장 고장,<br>찍어서 보내면<br>끝이에요</h1>
+        <p>냉장고, 환풍기, 화장실, 간판까지<br>사진 3장이면 전문 기사님이 출발해요.</p>
+        <button class="shoot-cta" id="startBtn">
+          <span class="cam"><svg class="i"><use href="#i-cam"/></svg></span>
+          <span><b>고장 난 제품 찍기</b><small>고장 종류 고르고 사진 3장이면 접수 끝</small></span>
+        </button>
+        <div class="steps-mini">
+          <div><b>1</b>고장 종류</div><div><b>2</b>사진 3장</div><div><b>3</b>증상</div><div><b>4</b>기사 출발</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>다른 서비스</h3>
+        <div class="svcgrid">
+          <button class="svc" data-svc="q-type"><span class="ic"><svg class="i"><use href="#i-doc"/></svg></span><b>견적 받기</b><small>간판 제작·천갈이<br>철거·인테리어</small></button>
+          <button class="svc" data-svc="u-home"><span class="ic"><svg class="i"><use href="#i-fridge"/></svg></span><b>중고 장터</b><small>점검 완료 장비<br>사고·팔기</small></button>
+          <button class="svc" data-svc="m-form"><span class="ic"><svg class="i"><use href="#i-box"/></svg></span><b>운반·설치</b><small>장비 옮기기<br>설치까지</small></button>
+        </div>
+        <button class="localbtn" id="toLocal"><span class="avstack" id="avStack"></span><span><b>우리 동네 기사님 보기</b><small id="localSub">마포구 · 평가 좋은 기사님을 미리 봐두세요</small></span><svg class="i arr"><use href="#i-next"/></svg></button>
+        <h3>찍꼬로 부르면 달라지는 점</h3>
+        <div class="why">
+          <div><span class="ic"><svg class="i"><use href="#i-box"/></svg></span><span><b>한 번 방문으로 끝나요</b><small>기사님이 모델명과 에러코드를 미리 보고 맞는 부품을 챙겨 와요.</small></span></div>
+          <div><span class="ic"><svg class="i"><use href="#i-wrench"/></svg></span><span><b>그 장비 전문가만 와요</b><small>냉장·냉동, 보일러, 누수, 하수구, 간판까지 분야별로 검증된 기사님을 연결해요.</small></span></div>
+          <div><span class="ic"><svg class="i"><use href="#i-won"/></svg></span><span><b>수리 전에 금액을 알아요</b><small>예상 비용을 먼저 보여드리고, 현장 견적도 수리 전에 확인해요.</small></span></div>
+          <div><span class="ic"><svg class="i"><use href="#i-doc"/></svg></span><span><b>피해가 생겨도 보험으로 처리해요</b><small>배상책임보험 가입 기사님 배지를 확인하세요. 누수처럼 이웃 피해가 생기면 보험 청구 서류까지 챙겨드려요.</small></span></div>
+        </div>
+        <a href="https://claude.ai/artifact/DyyuCFs1U2VXFEsPBTnxSM" target="_blank" rel="noopener" style="display:block;text-align:center;color:var(--muted);font-size:14px;font-weight:600;padding:18px 0 4px;text-decoration:underline;text-underline-offset:4px">기사님이세요? 찍꼬 파트너 등록하기</a>
+      </div>
+    </section>
+
+    <!-- CATEGORY -->
+    <section class="screen" id="s-cat">
+      <h2>무엇이 고장 났나요?</h2>
+      <p class="lead">고르면 그 분야 전문 기사님에게만 호출이 가요.</p>
+      <div class="catgrid" id="catgrid"></div>
+    </section>
+
+    <!-- STEP 1-3 camera screens -->
+    <section class="screen" id="s-1">
+      <div class="catpill" id="cp1"></div>
+      <h2 id="t1">제품 전체를 찍어주세요</h2>
+      <p class="lead" id="l1">한 발 물러나서 기계 전체가 나오게 찍으면 돼요.</p>
+      <div class="finder" id="f1"><div class="ghost"><svg class="i"><use href="#i-fridge"/></svg></div><div class="corners"><i></i><i></i><i></i><i></i></div><div class="scan"></div><div class="ai">AI 분석 중</div><div class="hint">제품 전체가 들어오게</div></div>
+      <div class="camrow">
+        <button class="side" data-sample="1"><span class="sq"><svg class="i"><use href="#i-img"/></svg></span>샘플 사진</button>
+        <label class="shutter" aria-label="사진 찍기"><input type="file" accept="image/*" capture="environment" data-slot="1"></label>
+        <span class="side" aria-hidden="true" style="visibility:hidden"><span class="sq"></span>.</span>
+      </div>
+      <div id="r1"></div>
+    </section>
+
+    <section class="screen" id="s-2">
+      <h2 id="t2">라벨을 가까이 찍어주세요</h2>
+      <p class="lead" id="l2">보통 문 안쪽 옆면이나 뒷면에 붙어 있어요.</p>
+      <div class="finder" id="f2"><div class="ghost"><svg class="i"><use href="#i-doc"/></svg></div><div class="corners"><i></i><i></i><i></i><i></i></div><div class="scan"></div><div class="ai">라벨 읽는 중</div><div class="hint">글자가 선명하게 보이게</div></div>
+      <div class="camrow">
+        <button class="side" data-sample="2"><span class="sq"><svg class="i"><use href="#i-img"/></svg></span>샘플 사진</button>
+        <label class="shutter" aria-label="사진 찍기"><input type="file" accept="image/*" capture="environment" data-slot="2"></label>
+        <span class="side" aria-hidden="true" style="visibility:hidden"><span class="sq"></span>.</span>
+      </div>
+      <div id="r2"></div>
+    </section>
+
+    <section class="screen" id="s-3">
+      <h2 id="t3">에러코드가 떠 있나요?</h2>
+      <p class="lead" id="l3">온도 표시창에 E1, F3 같은 코드가 보이면 찍어주세요.</p>
+      <div class="finder" id="f3"><div class="ghost"><svg class="i"><use href="#i-thermo"/></svg></div><div class="corners"><i></i><i></i><i></i><i></i></div><div class="scan"></div><div class="ai">코드 해석 중</div><div class="hint">표시창이 잘 보이게</div></div>
+      <div class="camrow">
+        <button class="side" data-sample="3"><span class="sq"><svg class="i"><use href="#i-img"/></svg></span>샘플 사진</button>
+        <label class="shutter" aria-label="사진 찍기"><input type="file" accept="image/*" capture="environment" data-slot="3"></label>
+        <span class="side" aria-hidden="true" style="visibility:hidden"><span class="sq"></span>.</span>
+      </div>
+      <button class="skipline" id="skip3">코드가 없어요, 건너뛸게요</button>
+      <div id="r3"></div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="screen" id="s-4">
+      <h2>어떤 증상인가요?</h2>
+      <p class="lead">해당하는 걸 모두 눌러주세요.</p>
+      <div class="chips" id="chips"></div>
+      <label class="sr" for="memo">기사님께 전할 말</label>
+      <textarea id="memo" placeholder="기사님께 전할 말 (선택)&#10;예: 어제 저녁부터 그랬어요, 3시 이후 방문 원해요"></textarea>
+    </section>
+
+    <!-- SUMMARY -->
+    <section class="screen" id="s-sum">
+      <h2>이 내용으로 기사님을 부를게요</h2>
+      <p class="lead">AI가 사진과 증상을 정리했어요.</p>
+      <div id="sumBody"></div>
+    </section>
+
+    <!-- MATCHING -->
+    <section class="screen" id="s-match">
+      <div class="radar" id="radar" aria-hidden="true"><div class="grid"></div><i class="ring"></i><i class="ring"></i><i class="ring"></i><div class="core"><svg class="i"><use href="#i-wrench"/></svg></div></div>
+      <div class="center">
+        <h2>근처 기사님을 찾고 있어요</h2>
+        <p class="lead" style="margin:0">최대 5분 동안 근처 전문 기사님들 화면에 호출이 떠요. 가장 먼저 잡은 기사님이 출발해요.</p>
+      </div>
+      <div class="found" id="found" aria-live="polite"></div>
+    </section>
+
+    <!-- MATCHED -->
+    <section class="screen" id="s-done">
+      <div class="mapwrap">
+        <svg viewBox="0 0 400 260" aria-hidden="true">
+          <rect width="400" height="260" fill="#E6E8EB"/>
+          <g fill="#F7F8F9"><rect x="0" y="40" width="400" height="16"/><rect x="0" y="150" width="400" height="20"/><rect x="70" y="0" width="16" height="260"/><rect x="200" y="0" width="20" height="260"/><rect x="320" y="0" width="14" height="260"/></g>
+          <g fill="#D7EBD9"><rect x="230" y="66" width="80" height="74" rx="6"/><rect x="92" y="180" width="96" height="70" rx="6"/></g>
+          <g fill="#DADDE1"><rect x="96" y="66" width="96" height="74" rx="6"/><rect x="10" y="66" width="52" height="74" rx="6"/><rect x="230" y="180" width="80" height="70" rx="6"/><rect x="344" y="66" width="50" height="74" rx="6"/></g>
+          <path d="M327 216 V160 H210 V48 H78" fill="none" stroke="#FF6B00" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1 10"/>
+          <path d="M327 216 V160 H262" fill="none" stroke="#FF6B00" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="262" cy="160" r="15" fill="#FF6B00" opacity=".2"/><circle cx="262" cy="160" r="9" fill="#FF6B00" stroke="#fff" stroke-width="3"/>
+          <g transform="translate(78 48)"><circle r="16" fill="#17191D"/><path d="M-6 -2 L0 -8 L6 -2 V7 H-6Z" fill="#fff"/></g>
+        </svg>
+        <div class="etapill"><svg class="i" style="width:16px;height:16px"><use href="#i-bolt"/></svg>도착까지 <b>14분</b></div>
+      </div>
+      <div class="techcard">
+        <div class="tech">
+          <span class="avatar" id="dAv"><svg viewBox="0 0 56 56"><rect width="56" height="56" fill="#FFE2CC"/><circle cx="28" cy="23" r="10" fill="#E3A57E"/><path d="M17 20a11 9 0 0 1 22 0v-2H17z" fill="#2B2B2B"/><path d="M8 56c2-12 10-17 20-17s18 5 20 17z" fill="#24364F"/><rect x="25" y="39" width="6" height="8" fill="#FF6B00"/></svg></span>
+          <span style="flex:1"><b id="dName">김도윤 기사님</b><small id="dMeta">업소용 냉장·냉동 12년 · 1.8km</small><br><span class="stars" id="dStar">★ 4.9</span> <small id="dCnt">리뷰 214개</small></span>
+        </div>
+        <div class="carry" id="carry"></div>
+        <div class="praise" id="dPraise"><span>친절해요<b>128</b></span><span>감사해요<b>104</b></span><span>설명이 꼼꼼해요<b>96</b></span><span>빨리 와주셨어요<b>81</b></span></div>
+        <p class="lastrv" id="dLast">“밤늦게 연락했는데도 와주셔서 정말 감사했어요” · △△분식 사장님</p>
+        <div class="acts">
+          <button class="btn soft" onclick="alert('데모: 실제 서비스에서는 기사님에게 전화가 연결됩니다.')"><svg class="i"><use href="#i-phone"/></svg>전화하기</button>
+          <button class="btn soft" id="openTicket"><svg class="i"><use href="#i-doc"/></svg>기사님 화면</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="lab">진행 상황</div>
+        <ol class="timeline"><li class="done">접수</li><li class="done">배정</li><li class="done now">이동 중</li><li>수리</li><li>완료</li></ol>
+      </div>
+      <button class="btn primary" id="toReview" style="width:100%;margin-top:4px">데모: 수리 완료로 넘어가기</button>
+      <button class="linkbtn" id="restart">처음부터 다시 체험하기</button>
+    </section>
+
+    <!-- LOCAL LIST -->
+    <section class="screen" id="s-local">
+      <div class="areabar"><b id="areaTitle">내 매장 근처</b>
+        <label class="sr" for="areaSel">지역</label><select id="areaSel"><option>마포구</option><option>서대문구</option><option>용산구</option></select></div>
+      <div class="seg2" id="lview" hidden><button aria-pressed="false" data-v="list">목록</button><button aria-pressed="true" data-v="map">지도</button></div>
+      <div class="flt" id="flt"></div>
+      <div id="mapWrap">
+        <div class="lmap" id="lmap"></div>
+        <div id="mapSel"></div>
+        <p class="demo-note" style="text-align:center">기사님 위치는 개인정보 보호를 위해 활동 지역 기준으로 대략 표시돼요.<br>실제 서비스에서는 네이버 지도 위에 표시돼요.</p>
+      </div>
+      <h3 id="listHead" style="font-size:16px;margin:18px 2px 10px"></h3>
+      <div class="plist" id="plist"></div>
+      <p class="demo-note" style="text-align:center;margin-top:14px">연락은 찍꼬 앱 안에서만 할 수 있어요. 기사님 연락처는 공개하지 않아요.</p>
+    </section>
+
+    <!-- PRO DETAIL -->
+    <section class="screen" id="s-pro"><div id="proBody"></div></section>
+
+
+    <!-- ===== QUOTE ===== -->
+    <section class="screen" id="s-q-type">
+      <h2>어떤 공사 견적이 필요하세요?</h2>
+      <p class="lead">한 번 요청하면 근처 업체 여러 곳의 견적을 비교할 수 있어요.</p>
+      <div class="catgrid" id="qgrid"></div>
+    </section>
+    <section class="screen" id="s-q-form">
+      <div class="catpill" id="qpill"></div>
+      <h2>현장 정보를 알려주세요</h2>
+      <p class="lead">자세할수록 견적이 정확해져요.</p>
+      <div class="fld"><span class="ql">현장 사진 (최대 4장)</span><div class="phrow" id="qph"></div></div>
+      <div class="fld"><label class="ql" for="qsize" id="qsizeL"></label><input class="inp2" id="qsize"></div>
+      <div class="fld"><span class="ql">추가 사항</span><div class="qtags" id="qext" style="margin:0"></div></div>
+      <div class="fld"><span class="ql">희망 일정</span><div class="seg2" id="qwhen"><button aria-pressed="false">이번 주</button><button aria-pressed="true">2주 안</button><button aria-pressed="false">한 달 안</button><button aria-pressed="false">상관없음</button></div></div>
+      <div class="fld"><label class="ql" for="qmemo">요청 사항 (선택)</label><textarea id="qmemo" placeholder="예: 상호가 바뀌어서 같은 크기로 새로 하고 싶어요" style="margin-top:0"></textarea></div>
+    </section>
+    <section class="screen" id="s-q-wait">
+      <div class="okbig" style="background:var(--orange)"><svg class="i"><use href="#i-doc"/></svg></div>
+      <div class="center"><h2>견적 요청을 보냈어요</h2><p class="lead" id="qwaitLead"></p></div>
+      <div class="card"><div class="lab">이렇게 진행돼요</div><div class="mrow"><span>1. 업체가 사진 보고 견적 작성</span><b>보통 하루 안</b></div><div class="mrow"><span>2. 견적 비교 후 업체 선택</span><b>사장님</b></div><div class="mrow"><span>3. 실측 방문 후 최종 확정</span><b>업체</b></div><div class="mrow"><span>4. 계약금 결제 (찍꼬 보관)</span><b>30%</b></div></div>
+      <p class="demo-note" style="text-align:center">실제로는 견적이 오면 카카오 알림톡으로 알려드려요.</p>
+    </section>
+    <section class="screen" id="s-q-list">
+      <h2 id="qlistT">견적 3개가 도착했어요</h2>
+      <p class="lead">가격만 보지 말고 포함 내역과 A/S도 비교해보세요.</p>
+      <div id="qlist"></div>
+    </section>
+
+    <!-- ===== USED ===== -->
+    <section class="screen" id="s-u-home">
+      <div class="seg2" id="utab"><button aria-pressed="true" data-t="buy">사기</button><button aria-pressed="false" data-t="sell">팔기</button></div>
+      <div id="ubuy">
+        <div class="flt" id="uflt"></div>
+        <div class="ugrid" id="ugrid"></div>
+        <p class="demo-note" style="text-align:center;margin-top:12px">‘찍꼬 점검’ 표시는 찍꼬 기사님이 직접 작동을 확인한 장비예요.</p>
+      </div>
+      <div id="usell" hidden>
+        <h2>팔 장비를 찍어주세요</h2>
+        <p class="lead">AI가 시세를 알려드리고, 바로 팔거나 찍꼬가 매입할 수 있어요.</p>
+        <div class="phrow" id="uph"></div>
+        <div id="uquote"></div>
+        <button class="linkcard" id="toClose"><svg class="i"><use href="#i-box"/></svg><span><b>폐업 정리 중이세요?</b><br>주방 장비 전체를 한 번에 매입 견적 받을 수 있어요.</span></button>
+      </div>
+    </section>
+    <section class="screen" id="s-u-item"><div id="uitem"></div></section>
+
+    <!-- ===== MOVE ===== -->
+    <section class="screen" id="s-m-form">
+      <h2>무엇을 옮기세요?</h2>
+      <p class="lead">장비 종류와 개수에 맞춰 차량과 인원을 정해드려요.</p>
+      <div class="card" id="mitems" style="margin-top:0"></div>
+      <div class="fld" style="margin-top:14px"><label class="ql" for="mfrom">출발지</label><input class="inp2" id="mfrom" value="서울 마포구 망원동 ○○식당"><div class="seg2" id="mfromF" style="margin:8px 0 0"><button aria-pressed="true" data-v="0">1층·엘베</button><button aria-pressed="false" data-v="1">계단 2층</button><button aria-pressed="false" data-v="2">계단 3층+</button></div></div>
+      <div class="fld"><label class="ql" for="mto">도착지</label><input class="inp2" id="mto" value="서울 마포구 합정동 새 매장"><div class="seg2" id="mtoF" style="margin:8px 0 0"><button aria-pressed="true" data-v="0">1층·엘베</button><button aria-pressed="false" data-v="1">계단 2층</button><button aria-pressed="false" data-v="2">계단 3층+</button></div></div>
+      <div class="fld"><span class="ql">날짜</span><div class="seg2" id="mdate"><button aria-pressed="false">오늘</button><button aria-pressed="true">내일</button><button aria-pressed="false">이번 주말</button><button aria-pressed="false">날짜 선택</button></div></div>
+      <div class="card" style="margin-top:0">
+        <div class="tgl"><span><b>도착해서 설치까지</b><small>수평 맞추기, 전원·배수 연결 (장비당 3만 원)</small></span><button class="sw2" id="minst" aria-pressed="false" aria-label="설치 포함"></button></div>
+        <div class="tgl"><span><b>기존 장비 수거·폐기</b><small>폐가전 처리 포함 (4만 원)</small></span><button class="sw2" id="mdisp" aria-pressed="false" aria-label="수거 포함"></button></div>
+      </div>
+      <div class="card pricecard" id="mest"></div>
+    </section>
+
+    <!-- ===== GENERIC OK ===== -->
+    <section class="screen" id="s-x-ok"><div id="xok"></div></section>
+    <!-- REVIEW -->
+    <section class="screen" id="s-review">
+      <div class="rv-av" id="rvAv"><svg viewBox="0 0 56 56"><rect width="56" height="56" fill="#FFE2CC"/><circle cx="28" cy="23" r="10" fill="#E3A57E"/><path d="M17 20a11 9 0 0 1 22 0v-2H17z" fill="#2B2B2B"/><path d="M8 56c2-12 10-17 20-17s18 5 20 17z" fill="#24364F"/><rect x="25" y="39" width="6" height="8" fill="#FF6B00"/></svg></div>
+      <div class="center"><h2><span id="rvName">김도윤</span> 기사님의 수리는<br>어떠셨나요?</h2><p class="lead">남겨주신 평가는 다른 사장님들이 기사님을 고를 때 큰 도움이 돼요.</p></div>
+      <div class="starrow" id="starRow" role="radiogroup" aria-label="별점"></div>
+      <p class="starlabel" id="starLabel" aria-live="polite">별을 눌러주세요</p>
+      <p class="qlab" id="qlab">어떤 점이 좋았나요? (여러 개 골라도 돼요)</p>
+      <div class="qtags" id="qtags"></div>
+      <label class="qlab" for="oneline" style="display:block">한줄평 (선택)</label>
+      <input class="oneline" id="oneline" maxlength="40" placeholder="예: 늦은 시간에도 빨리 와주셔서 감사해요">
+      <span class="cnt" id="cnt">0 / 40</span>
+    </section>
+
+    <!-- THANKS -->
+    <section class="screen" id="s-thanks">
+      <div class="okbig"><svg class="i"><use href="#i-check"/></svg></div>
+      <div class="center"><h2>평가 고마워요!</h2><p class="lead">기사님께 사장님의 평가가 전달됐어요.</p></div>
+      <div class="rvcard" id="rvPreview"></div>
+      <div class="card" style="margin-top:10px"><div class="lab">30일 무상 재방문 보증</div><span style="font-size:15px">같은 고장이 다시 생기면 30일 안에는 기사님이 무료로 다시 방문해요.</span></div>
+    </section>
+  </main>
+
+  <div class="bar" id="bar"><div class="inner"><button class="btn primary" id="cta">다음</button></div></div>
+</div>
+
+<div class="sheet-bg" id="sheetBg" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2 id="sheetTitle">기사님 앱에 이렇게 도착해요</h2>
+    <p class="lead">출발 전에 장비와 원인을 알 수 있어서, 필요한 부품을 챙겨 한 번에 고칠 수 있어요.</p>
+    <div class="techapp" id="ticket"></div>
+    <button class="btn primary" style="width:100%;margin-top:14px" id="closeSheet">닫기</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var ico=function(id){return '<svg class="i"><use href="#i-'+id+'"/></svg>'};
+  var SAMPLE = {
+    1:'<svg class="shot" viewBox="0 0 400 330" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sa" x1="0" x2="1"><stop offset="0" stop-color="#A9AFB6"/><stop offset=".5" stop-color="#D9DDE1"/><stop offset="1" stop-color="#9CA2A9"/></linearGradient><linearGradient id="sb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A3530"/><stop offset="1" stop-color="#26221E"/></linearGradient></defs><rect width="400" height="330" fill="url(#sb)"/><rect y="262" width="400" height="68" fill="#1E1B18"/><rect x="104" y="34" width="192" height="236" rx="7" fill="url(#sa)"/><line x1="200" y1="38" x2="200" y2="266" stroke="#8B9097" stroke-width="2"/><rect x="182" y="118" width="6" height="56" rx="3" fill="#6F757C"/><rect x="212" y="118" width="6" height="56" rx="3" fill="#6F757C"/><rect x="226" y="48" width="48" height="18" rx="3" fill="#0F1712"/><text x="250" y="62" font-size="12" text-anchor="middle" fill="#FF5A2C" font-family="monospace" font-weight="700">E1</text><rect x="110" y="268" width="14" height="8" fill="#555"/><rect x="276" y="268" width="14" height="8" fill="#555"/></svg>',
+    2:'<svg class="shot" viewBox="0 0 400 330" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="330" fill="#B9BEC4"/><rect x="64" y="66" width="272" height="198" rx="8" fill="#F4F4F0"/><rect x="64" y="66" width="272" height="40" rx="8" fill="#A50034"/><rect x="64" y="96" width="272" height="10" fill="#A50034"/><text x="84" y="94" font-size="20" font-weight="700" fill="#fff" font-family="sans-serif">LG</text><text x="84" y="136" font-size="14" fill="#222" font-family="sans-serif">업소용 냉장고</text><text x="84" y="162" font-size="13" fill="#333" font-family="monospace">MODEL  C1100</text><text x="84" y="186" font-size="13" fill="#333" font-family="monospace">REFRIG R-134a</text><text x="84" y="210" font-size="13" fill="#333" font-family="monospace">MFD    2021.04</text><text x="84" y="234" font-size="13" fill="#333" font-family="monospace">220V ~ 60Hz</text></svg>',
+    3:'<svg class="shot" viewBox="0 0 400 330" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="330" fill="#B3B8BE"/><rect x="92" y="96" width="216" height="138" rx="14" fill="#2A2E33"/><rect x="104" y="108" width="192" height="114" rx="8" fill="#0D1410"/><text x="200" y="192" font-size="72" text-anchor="middle" fill="#FF4A26" font-family="monospace" font-weight="700">E1</text><circle cx="124" cy="204" r="5" fill="#FF4A26"/></svg>'
+  };
+  var SYMPTOMS=[
+    {k:'cool',i:'thermo',t:'안 시원해요',causes:['냉매 부족 또는 누설','콘덴서 먼지 막힘','냉각 팬 모터 이상'],parts:['냉매(R-134a)'],cost:[60000,180000],urgent:true},
+    {k:'power',i:'power',t:'전원이 안 켜져요',causes:['메인 기판(PCB) 이상','릴레이 불량'],parts:['메인 기판'],cost:[120000,300000],urgent:true},
+    {k:'freeze',i:'snow',t:'너무 얼어요',causes:['온도 센서 이상','온도 설정 오류'],parts:['온도 센서'],cost:[40000,90000]},
+    {k:'noise',i:'sound',t:'소리가 커요',causes:['팬 모터 베어링 마모','압축기 진동'],parts:['팬 모터'],cost:[60000,140000]},
+    {k:'leak',i:'drop',t:'물이 새요',causes:['배수구 막힘','제상 히터 이상'],parts:['배수 호스'],cost:[30000,80000]},
+    {k:'door',i:'door',t:'문이 잘 안 닫혀요',causes:['도어 패킹 손상'],parts:['도어 패킹 고무'],cost:[35000,60000]},
+    {k:'frost',i:'frost',t:'성에가 많이 껴요',causes:['제상 히터 이상','도어 패킹 손상'],parts:['제상 히터'],cost:[60000,120000]},
+    {k:'etc',i:'help',t:'잘 모르겠어요',causes:['현장 점검 필요'],parts:[],cost:[0,50000]}
+  ];
+  var CALLOUT=20000;
+  var state={img:{},label:false,code:null,sym:new Set()};
+  var cur='home';
+  var $=function(id){return document.getElementById(id)};
+  var won=function(n){return n.toLocaleString('ko-KR')};
+  var esc=function(s){return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+  var note='<p class="demo-note">데모 화면이라 인식 결과는 예시로 보여드려요.</p>';
+  var ck='<span class="ck">'+ico('check')+'</span>';
+
+  SYMPTOMS.forEach(function(s){
+    var b=document.createElement('button');
+    b.className='chip';b.setAttribute('aria-pressed','false');
+    b.innerHTML='<span class="ic">'+ico(s.i)+'</span><b>'+s.t+'</b>';
+    b.onclick=function(){var on=state.sym.has(s.k);on?state.sym.delete(s.k):state.sym.add(s.k);b.setAttribute('aria-pressed',String(!on));updateBar();};
+    $('chips').appendChild(b);
+  });
+
+  function setShot(slot,html){
+    var f=$('f'+slot);
+    var old=f.querySelector('.shot');if(old)old.remove();
+    f.querySelector('.ghost').style.display='none';
+    f.insertAdjacentHTML('afterbegin',html);
+    f.querySelector('.hint').style.display='none';
+    state.img[slot]=html;
+    f.classList.add('scanning');$('r'+slot).innerHTML='';updateBar(true);
+    setTimeout(function(){
+      f.classList.remove('scanning');
+      readShot(slot);
+      updateBar();
+    },slot==='1'?1000:1800);
+  }
+  document.querySelectorAll('[data-sample]').forEach(function(b){b.onclick=function(){setShot(b.dataset.sample,sampleFor(b.dataset.sample))}});
+  document.querySelectorAll('input[type=file]').forEach(function(inp){
+    inp.onchange=function(){var file=inp.files&&inp.files[0];if(!file)return;var r=new FileReader();r.onload=function(){setShot(inp.dataset.slot,'<img class="shot" alt="찍은 사진" src="'+r.result+'">')};r.readAsDataURL(file);};
+  });
+  $('skip3').onclick=function(){state.code=null;state.img['3']=null;go('4')};
+
+  function diagnose(){
+    var picked=SYMPTOMS.filter(function(s){return state.sym.has(s.k)});
+    var causes=[],parts=[],lo=0,hi=0,urgent=false;
+    if(state.code&&CAT.code){causes.push(CAT.code.cause);parts.push(CAT.code.part);lo=CAT.code.cost[0];hi=CAT.code.cost[1];}
+    picked.forEach(function(s){
+      s.causes.forEach(function(c){if(causes.indexOf(c)<0&&causes.length<3)causes.push(c)});
+      s.parts.forEach(function(p){if(parts.indexOf(p)<0)parts.push(p)});
+      lo=Math.max(lo,s.cost[0]);hi+=s.cost[1]*0.6;if(s.urgent)urgent=true;
+    });
+    hi=Math.max(hi,lo+40000);
+    var r=function(n){return Math.round(n/10000)*10000};
+    return {causes:causes,parts:parts,lo:r(lo)+CALLOUT,hi:r(hi)+CALLOUT,urgent:urgent,picked:picked};
+  }
+  var strip=function(h){return h?h.replace(' class="shot"',''):''};
+
+  function renderSummary(){
+    var d=diagnose(),memo=$('memo').value.trim();
+    var th='<div class="thumbs">'+['1','2','3'].map(function(k){return state.img[k]?'<div>'+strip(state.img[k])+'</div>':'<div class="none">건너뜀</div>'}).join('')+'</div>';
+    $('sumBody').innerHTML=
+      '<div class="card"><div class="equip"><div class="ph">'+strip(state.img['1'])+'</div><div><b>'+CAT.equip[0]+'</b><small>'+CAT.equip[1]+(state.code&&CAT.code?' · 에러 '+CAT.code.c:'')+'</small></div></div>'+th+'</div>'+
+      '<div class="card"><div class="lab" style="justify-content:space-between"><span>증상</span><span class="badge '+(d.urgent?'urgent':'normal')+'">'+(d.urgent?ico('bolt')+'긴급 · '+CAT.urg:'일반 접수')+'</span></div><div class="tags">'+d.picked.map(function(s){return '<span>'+s.t+'</span>'}).join('')+'</div>'+(memo?'<p style="margin:10px 0 0;color:var(--muted);font-size:14px">“'+esc(memo)+'”</p>':'')+'</div>'+
+      '<div class="card"><div class="lab">AI 예상 원인</div><ol class="causes">'+d.causes.map(function(c,i){return '<li><i>'+(i+1)+'</i>'+c+'</li>'}).join('')+'</ol>'+
+        (d.parts.length?'<div class="lab" style="margin-top:14px">기사님이 챙겨갈 부품</div><div class="tags">'+d.parts.map(function(p){return '<span>'+p+'</span>'}).join('')+'</div>':'')+'</div>'+
+      insCard()+'<div class="card pricecard"><div class="lab">예상 비용 (출장비 포함)</div><div class="price">'+won(d.lo)+'<span>원</span> ~ '+won(d.hi)+'<span>원</span></div><small>정확한 금액은 기사님이 현장 확인 후 수리 전에 알려드려요.</small></div>';
+    $('carry').innerHTML=ico('box')+(d.parts.length?d.parts.join(', ')+' 챙겨서 출발했어요':'점검 장비 챙겨서 출발했어요');
+    $('ticket').innerHTML=
+      '<div class="hd"><span>'+(d.urgent?'⚡ 긴급 출동 요청':'새 작업 요청')+'</span><small>1.8km · 14분</small></div><div class="bd">'+
+      '<div class="r"><span>위치</span><b>서울 마포구 ○○식당 주방</b></div>'+
+      '<div class="r"><span>장비</span><b>'+CAT.equip[0]+'</b></div>'+
+      '<div class="r"><span>에러코드</span><b class="o">'+(state.code&&CAT.code?CAT.code.c+' · '+CAT.code.m:'없음')+'</b></div>'+
+      '<div class="r"><span>증상</span><b>'+d.picked.map(function(s){return s.t}).join(', ')+'</b></div>'+
+      '<div class="r"><span>AI 추정</span><b>'+d.causes.join(' / ')+'</b></div>'+
+      '<div class="r"><span>챙길 부품</span><b class="o">'+(d.parts.join(', ')||'점검 장비')+'</b></div>'+
+      (memo?'<div class="r"><span>메모</span><b>'+esc(memo)+'</b></div>':'')+
+      '<div class="r"><span>예상 수입</span><b>'+won(d.lo)+' ~ '+won(d.hi)+'원</b></div></div>'+
+      '<div class="ft"><div class="no">거절</div><div class="yes">수락하고 출발</div></div>';
+  }
+
+  var BAR={'1':['다음',function(){return state.label||!!state.img['1']&&!$('f1').classList.contains('scanning')}],
+    '2':['다음',function(){return state.label}],'3':['다음',function(){return state.code!==null}],
+    '4':['요청 내용 확인하기',function(){return state.sym.size>0}],sum:['⚡ 기사님 부르기',function(){return true}]};
+  var NEXT={'1':'2','2':'3','3':'4','4':'sum',sum:'match'};
+  var TITLE={'1':'제품 사진','2':'라벨','3':'에러코드','4':'증상',sum:'요청 확인',match:'',done:''};
+
+  function updateBar(busy){
+    var b=BAR[cur];$('bar').style.display=b?'':'none';if(!b)return;
+    $('cta').textContent=b[0];$('cta').disabled=busy===true||!b[1]();
+  }
+  function go(id){
+    $('s-'+cur).classList.remove('on');cur=id;$('s-'+id).classList.add('on');
+    var step=['1','2','3','4'].indexOf(id);
+    $('stepHead').hidden=!(step>=0||id==='sum');
+    $('progress').hidden=step<0;
+    $('stepTitle').textContent=TITLE[id]||'';
+    $('stepCount').textContent=step>=0?(step+1)+' / 4':'';
+    document.querySelectorAll('#progress span').forEach(function(s,i){s.classList.toggle('on',i<=step)});
+    if(id==='sum')renderSummary();
+    if(id==='match')runMatch();
+    updateBar();window.scrollTo(0,0);
+  }
+  function runMatch(){
+    var f=$('found');f.innerHTML='';
+    document.querySelectorAll('#radar .pin').forEach(function(p){p.remove()});
+    [[30,40],[70,22],[20,72],[78,66]].forEach(function(p,i){setTimeout(function(){var d=document.createElement('i');d.className='pin';d.style.left=p[0]+'%';d.style.top=p[1]+'%';$('radar').appendChild(d)},500*(i+1))});
+    matchMsgs().forEach(function(m,i){
+      setTimeout(function(){if(cur!=='match')return;var d=document.createElement('div');d.innerHTML=ico('check')+'<span>'+m+'</span>';f.appendChild(d)},1000*(i+1));
+    });
+    setTimeout(function(){if(cur==='match')go('done')},4000);
+  }
+  $('startBtn').onclick=function(){go('1')};
+  $('cta').onclick=function(){var n=NEXT[cur];if(n)go(n)};
+  $('backBtn').onclick=function(){var b={'1':'home','2':'1','3':'2','4':'3',sum:'4'};if(b[cur])go(b[cur])};
+  $('openTicket').onclick=function(){$('sheetBg').classList.add('open');$('closeSheet').focus()};
+  $('closeSheet').onclick=function(){$('sheetBg').classList.remove('open');$('openTicket').focus()};
+  $('sheetBg').onclick=function(e){if(e.target===this)$('closeSheet').onclick()};
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&$('sheetBg').classList.contains('open'))$('closeSheet').onclick()});
+  $('restart').onclick=function(){location.reload()};
+  // ---- review ----
+  var GOOD=['친절해요','감사해요','빨리 와주셨어요','설명이 꼼꼼해요','깔끔하게 마무리했어요','가격이 합리적이에요'];
+  var BAD=['도착이 늦었어요','설명이 부족했어요','가격이 비쌌어요','마무리가 아쉬워요','다시 고장 났어요'];
+  var LABEL=['','많이 아쉬워요','아쉬워요','보통이에요','좋았어요','최고예요!'];
+  state.stars=0;state.tags=new Set();
+  for(var n=1;n<=5;n++){(function(n){var b=document.createElement('button');b.setAttribute('role','radio');b.setAttribute('aria-checked','false');b.setAttribute('aria-label',n+'점');b.innerHTML='<svg><use href="#i-star"/></svg>';b.onclick=function(){setStars(n)};$('starRow').appendChild(b)})(n)}
+  function setStars(n){
+    var wasGood=state.stars>=4,isGood=n>=4;state.stars=n;
+    $('starRow').querySelectorAll('button').forEach(function(b,i){b.classList.toggle('on',i<n);b.setAttribute('aria-checked',String(i===n-1))});
+    $('starLabel').textContent=LABEL[n];
+    if(state.tagsBuilt!==isGood){state.tags.clear();buildTags(isGood)}
+    updateBar();
+  }
+  function buildTags(good){
+    state.tagsBuilt=good;$('qlab').textContent=good?'어떤 점이 좋았나요? (여러 개 골라도 돼요)':'어떤 점이 아쉬웠나요? (찍꼬가 직접 확인할게요)';
+    var q=$('qtags');q.innerHTML='';
+    (good?GOOD:BAD).forEach(function(t){var b=document.createElement('button');b.textContent=t;b.setAttribute('aria-pressed','false');b.onclick=function(){var on=state.tags.has(t);on?state.tags.delete(t):state.tags.add(t);b.setAttribute('aria-pressed',String(!on))};q.appendChild(b)});
+  }
+  buildTags(true);
+  $('oneline').addEventListener('input',function(){$('cnt').textContent=this.value.length+' / 40'});
+  function renderThanks(){
+    var line=$('oneline').value.trim();
+    $('rvPreview').innerHTML='<div class="lab">내가 남긴 평가</div><div class="st">'+'★'.repeat(state.stars)+'<span style="color:var(--line)">'+'★'.repeat(5-state.stars)+'</span></div>'+
+      (state.tags.size?'<div class="tg">'+Array.from(state.tags).map(function(t){return '<span>'+t+'</span>'}).join('')+'</div>':'')+
+      (line?'<q>'+esc(line)+'</q>':'')+
+      (state.stars<=3?'<p style="margin:10px 0 0;font-size:13.5px;color:var(--muted)">아쉬운 점은 찍꼬 담당자가 직접 확인하고 연락드릴게요.</p>':'');
+  }
+
+  // ---- local pros ----
+  function av(skin,hair,shirt,bg,long){return '<svg viewBox="0 0 56 56"><rect width="56" height="56" fill="'+bg+'"/>'+(long?'<path d="M15 24a13 13 0 0 1 26 0v14H15z" fill="'+hair+'"/>':'')+'<circle cx="28" cy="23" r="10" fill="'+skin+'"/><path d="M17 20a11 9 0 0 1 22 0v-2H17z" fill="'+hair+'"/><path d="M8 56c2-12 10-17 20-17s18 5 20 17z" fill="'+shirt+'"/><rect x="25" y="39" width="6" height="8" fill="#FF6B00"/></svg>'}
+  var PROS=[
+    {id:'kim',name:'김도윤',av:av('#E3A57E','#2B2B2B','#24364F','#FFE2CC'),eq:['냉장·냉동','쇼케이스'],yrs:12,star:4.9,cnt:214,km:1.8,badges:[['f','창립 파트너'],['s','보험 가입']],intro:'업소용 냉장·냉동 12년 했습니다. 부품 챙겨서 한 번에 끝내드릴게요.',tags:{'친절해요':128,'감사해요':104,'설명이 꼼꼼해요':96,'빨리 와주셨어요':81},done:342,eta:'16분',re:'38%',rv:[['△△분식',5,'밤늦게 연락했는데도 와주셔서 정말 감사했어요'],['□□카페',5,'고장 원인을 쉽게 설명해주셔서 좋았어요']]},
+    {id:'lee',name:'이승민',av:av('#D9996F','#3A2A20','#3C4A3A','#E3EEDC'),eq:['냉장·냉동','에어컨'],yrs:15,star:4.9,cnt:301,km:2.6,badges:[['s','보험 가입']],intro:'에어컨, 냉동창고까지 다 봅니다. 큰 장비도 맡겨주세요.',tags:{'설명이 꼼꼼해요':140,'친절해요':118,'가격이 합리적이에요':92,'감사해요':77},done:520,eta:'22분',re:'41%',rv:[['◇◇치킨',5,'냉동창고 문제를 정확히 짚어주셨어요'],['☆☆고깃집',4,'조금 늦었지만 확실하게 고쳐주셨어요']]},
+    {id:'park',name:'박준혁',av:av('#E8B48C','#1E1E1E','#5A3A2A','#F3E3D3'),eq:['제빙기','식기세척기'],yrs:8,star:4.8,cnt:132,km:1.1,badges:[['f','창립 파트너'],['s','보험 가입']],intro:'제빙기·식기세척기 전문입니다. 물 관련 고장은 자신 있어요.',tags:{'빨리 와주셨어요':71,'친절해요':64,'감사해요':58,'깔끔하게 마무리했어요':40},done:198,eta:'11분',re:'33%',rv:[['○○호프',5,'얼음이 안 나와서 급했는데 금방 와주셨어요']]},
+    {id:'choi',name:'최유진',av:av('#F0C2A0','#4A2B1F','#2F3D5C','#E5E9F5',true),eq:['커피머신','제빙기'],yrs:6,star:4.7,cnt:88,km:2.2,badges:[['s','보험 가입']],intro:'카페 장비(커피머신·제빙기) 전문입니다. 영업 전 아침 방문도 가능해요.',tags:{'친절해요':52,'설명이 꼼꼼해요':47,'감사해요':39},done:121,eta:'19분',re:'45%',rv:[['◎◎커피',5,'오픈 전에 와주셔서 영업에 지장이 없었어요']]},
+    {id:'jung',name:'정하늘',av:av('#E0A882','#2B2B2B','#4A4F56','#ECECEC'),eq:['냉장·냉동','식기세척기'],yrs:3,star:4.8,cnt:6,km:0.9,badges:[['n','신규 파트너']],intro:'새로 함께하게 됐습니다. 가까운 곳은 빠르게 달려갑니다.',tags:{'빨리 와주셨어요':5,'친절해요':4},done:6,eta:'9분',re:'-',rv:[['▽▽국밥',5,'젊은 기사님인데 꼼꼼하게 봐주셨어요']]}
+  ];
+  PROS.push(
+    {id:'oh',name:'오상훈',av:av('#DDA27A','#2B2B2B','#7A2E2E','#F7E1DA'),eq:['보일러'],yrs:14,star:4.9,cnt:187,km:2.1,badges:[['s','보험 가입'],['f','가스시설 자격']],intro:'업소용·가정용 보일러, 온수기 14년. 겨울철 긴급 출동 자신 있습니다.',tags:{'빨리 와주셨어요':92,'친절해요':80,'설명이 꼼꼼해요':61},done:260,eta:'18분',re:'36%',rv:[['◁◁식당',5,'영하 날씨에 온수가 끊겼는데 한 시간 만에 해결됐어요']]},
+    {id:'han',name:'한동욱',av:av('#E6B08A','#1F1F1F','#2F4A5A','#DDEBF0'),eq:['누수','하수구','화장실'],yrs:10,star:4.8,cnt:156,km:1.6,badges:[['s','보험 가입'],['f','누수탐지 장비']],intro:'청음·열화상 장비로 누수 위치를 찾고, 하수구 고압세척까지 합니다. 보험 청구용 소견서도 써드려요.',tags:{'설명이 꼼꼼해요':88,'감사해요':70,'깔끔하게 마무리했어요':55},done:211,eta:'20분',re:'29%',rv:[['▷▷주점',5,'아래층 피해 보험 처리 서류까지 챙겨주셔서 큰 도움 됐어요']]},
+    {id:'seo',name:'서재원',av:av('#D8A07A','#3A2A20','#3A3A3A','#ECE6DD'),eq:['간판','전기'],yrs:9,star:4.7,cnt:94,km:2.9,badges:[['s','보험 가입'],['f','전기기능사']],intro:'LED 간판, 천갈이, 풍선간판 수리부터 조명·차단기까지 봅니다. 고소작업 장비 보유.',tags:{'빨리 와주셨어요':48,'친절해요':40,'가격이 합리적이에요':33},done:130,eta:'24분',re:'31%',rv:[['◈◈카페',5,'간판 불이 안 들어왔는데 저녁 영업 전에 고쳐주셨어요'],['◐◐미용실',5,'상호 바꾸면서 천갈이 했는데 시안부터 설치까지 깔끔했어요']]},
+    {id:'bae',name:'배성진',av:av('#DCA27C','#2B2B2B','#3A3A3A','#EDE4DA'),eq:['환풍기·덕트'],yrs:12,star:4.8,cnt:143,km:2.0,badges:[['s','보험 가입'],['f','덕트 청소 장비']],intro:'고깃집 후드·덕트, 테이블 환풍구 전문입니다. 모터 교체부터 덕트 청소까지 해요.',tags:{'깔끔하게 마무리했어요':70,'설명이 꼼꼼해요':58,'빨리 와주셨어요':44},done:205,eta:'21분',re:'44%',rv:[['▣▣고깃집',5,'저녁 장사 전에 환풍기 모터를 바로 갈아주셨어요']]},
+    {id:'yoon',name:'윤태성',av:av('#E2A985','#2B2B2B','#4B5A2F','#E8EEDC'),eq:['셔터·도어락'],yrs:7,star:4.8,cnt:73,km:1.3,badges:[['s','보험 가입']],intro:'전동 셔터, 유리문, 도어락 전문입니다. 마감 시간 긴급 출동 가능해요.',tags:{'빨리 와주셨어요':41,'감사해요':35},done:98,eta:'13분',re:'27%',rv:[['◆◆편의점',5,'셔터가 안 내려가서 퇴근을 못 하고 있었는데 바로 와주셨어요']]}
+  );
+  var FLT=['전체','냉장·냉동','환풍기·덕트','화장실','하수구','누수','보일러','간판','전기','셔터·도어락','에어컨','제빙기','식기세척기','쇼케이스','커피머신'];
+  var fsel='전체';state.fav=new Set(['kim']);state.pref=null;
+  $('avStack').innerHTML=PROS.slice(0,4).map(function(p){return '<span>'+p.av+'</span>'}).join('');
+  $('localSub').textContent='마포구 기사님 '+PROS.length+'명 · 평가 미리 보기';
+  FLT.forEach(function(f){var b=document.createElement('button');b.textContent=f;b.setAttribute('aria-pressed',String(f===fsel));b.onclick=function(){fsel=f;$('flt').querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});renderList()};$('flt').appendChild(b)});
+  function badgeHTML(p){return '<div class="bdg">'+(state.fav.has(p.id)?'<span class="f">내 단골</span>':'')+p.badges.map(function(b){return '<span class="'+b[0]+'">'+b[1]+'</span>'}).join('')+'</div>'}
+  function heart(p){return '<button class="heart" data-fav="'+p.id+'" aria-pressed="'+state.fav.has(p.id)+'" aria-label="단골 등록"><svg class="i"><use href="#i-heart"/></svg></button>'}
+  function renderList(){
+    var list=PROS.filter(function(p){return fsel==='전체'||p.eq.indexOf(fsel)>=0});
+    // 단골 먼저, 신규 파트너는 일정 위치에 노출
+    list.sort(function(a,b){return (state.fav.has(b.id)-state.fav.has(a.id))||(b.star*100+b.cnt/10-(a.star*100+a.cnt/10))});
+    var n=list.findIndex(function(p){return p.id==='jung'});if(n>2){var j=list.splice(n,1)[0];list.splice(2,0,j)}
+    $('plist').innerHTML=list.length?list.map(function(p){var top=Object.keys(p.tags).slice(0,2);return '<div class="pcard" role="button" tabindex="0" data-pro="'+p.id+'"><span class="pav">'+p.av+'</span><span class="bd"><span class="nm">'+p.name+' 기사님</span><div class="meta"><span class="st">★ '+p.star+'</span> 리뷰 '+p.cnt+' · '+p.eq.join('·')+' '+p.yrs+'년 · '+p.km+'km</div><div class="meta" style="margin-top:2px">'+top.map(function(t){return t+' '+p.tags[t]}).join(' · ')+'</div>'+badgeHTML(p)+'</span>'+heart(p)+'</div>'}).join(''):'<p class="emptymsg">이 장비를 고치는 기사님을 모으는 중이에요.<br>호출하면 근처 다른 지역 기사님께도 요청이 가요.</p>';
+  }
+  function findPro(id){return PROS.filter(function(p){return p.id===id})[0]}
+  function renderPro(id){
+    var p=findPro(id);state.viewPro=id;
+    var max=Math.max.apply(null,Object.keys(p.tags).map(function(k){return p.tags[k]}));
+    $('proBody').innerHTML='<div class="prohd"><div class="pav">'+p.av+'</div><h2 style="margin:0">'+p.name+' 기사님</h2><div class="meta" style="color:var(--muted);font-size:14px">'+p.eq.join(' · ')+' '+p.yrs+'년 · '+p.km+'km</div>'+badgeHTML(p)+'</div>'+
+      '<div class="pstats"><div><b>'+p.done+'</b><small>찍꼬 수리</small></div><div><b style="color:var(--orange)">★'+p.star+'</b><small>리뷰 '+p.cnt+'</small></div><div><b>'+p.eta+'</b><small>평균 도착</small></div></div>'+
+      '<div class="card"><div class="lab">기사님 한마디</div>'+p.intro+'</div>'+
+      '<div class="card"><div class="lab">사장님들이 많이 남긴 칭찬</div>'+Object.keys(p.tags).map(function(k){return '<div class="tbar"><span>'+k+'</span><i><b style="width:'+(p.tags[k]/max*100)+'%"></b></i><span>'+p.tags[k]+'</span></div>'}).join('')+
+      p.rv.map(function(r){return '<div class="rvi"><div class="h"><span>'+r[0]+' 사장님</span><b>'+'★'.repeat(r[1])+'</b></div>“'+r[2]+'”</div>'}).join('')+'</div>'+
+      '<div class="twobtn" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px"><button class="btn ghost" id="favBtn" style="background:var(--surface);box-shadow:var(--shadow)">'+(state.fav.has(p.id)?'♥ 단골 해제':'♡ 단골 등록')+'</button><button class="btn primary" id="prefBtn">이 기사님께 요청</button></div>'+
+      '<p class="prefnote">이 기사님께 먼저 호출이 가요. 5분 안에 못 잡으시면 근처 다른 전문 기사님께 자동으로 넘어가요.</p>';
+    $('favBtn').onclick=function(){toggleFav(p.id);renderPro(p.id)};
+    $('prefBtn').onclick=function(){state.pref=p.id;go('cat')};
+  }
+  function toggleFav(id){state.fav.has(id)?state.fav.delete(id):state.fav.add(id)}
+  $('plist').addEventListener('click',function(e){var h=e.target.closest('[data-fav]');if(h){e.stopPropagation();toggleFav(h.dataset.fav);renderList();return}var c=e.target.closest('[data-pro]');if(c){renderPro(c.dataset.pro);go('pro')}});
+  $('plist').addEventListener('keydown',function(e){if(e.key==='Enter'){var c=e.target.closest('[data-pro]');if(c){renderPro(c.dataset.pro);go('pro')}}});
+
+  // ---- 지도 보기 ----
+  var POS={bae:[15,25],yoon:[47,22],lee:[81,25],kim:[26,45],jung:[63,41],seo:[87,53],oh:[15,68],han:[67,64],park:[38,85],choi:[75,85]};
+  var mapSelId=null;
+  var MAPBASE='<svg class="base" viewBox="0 0 400 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="400" height="420" fill="#E9EBEE"/>'+
+    '<path d="M0 300 C120 270 200 330 400 290 L400 340 C220 380 120 320 0 350Z" fill="#B9D7EE"/>'+
+    '<g fill="#D6EBD3"><rect x="235" y="70" width="90" height="70" rx="10"/><rect x="40" y="200" width="70" height="60" rx="10"/></g>'+
+    '<g stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"><line x1="0" y1="160" x2="400" y2="190"/><line x1="140" y1="0" x2="170" y2="420"/><line x1="290" y1="0" x2="260" y2="290"/></g>'+
+    '<g stroke="#FFFFFF" stroke-width="6"><line x1="0" y1="90" x2="400" y2="100"/><line x1="0" y1="250" x2="400" y2="240"/><line x1="60" y1="0" x2="80" y2="300"/><line x1="350" y1="0" x2="340" y2="290"/><line x1="210" y1="0" x2="215" y2="300"/></g>'+
+    '<g font-size="11" fill="#7A8088" font-family="sans-serif"><text x="20" y="80">망원동</text><text x="300" y="60">서교동</text><text x="20" y="235">성산동</text><text x="230" y="230">합정동</text><text x="150" y="330">한강공원</text></g></svg>';
+  function renderMap(){
+    if($('mapWrap').hidden)return;
+    var list=PROS.filter(function(p){return fsel==='전체'||p.eq.indexOf(fsel)>=0});
+    if(mapSelId&&!list.some(function(p){return p.id===mapSelId}))mapSelId=null;
+    var h=MAPBASE+'<div class="me"><i></i><span>우리 매장</span></div>';
+    var sel=mapSelId&&findPro(mapSelId);
+    if(sel){var ps=POS[sel.id]||[50,50];var d=Math.round(26+sel.km*8);h+='<span class="zone" style="left:'+ps[0]+'%;top:'+(ps[1]-3)+'%;width:'+d*2+'%;aspect-ratio:1"></span>'}
+    h+=list.map(function(p){var ps=POS[p.id]||[50,50];return '<button class="mpin'+(state.fav.has(p.id)?' fav':'')+(p.id===mapSelId?' sel':'')+'" data-pin="'+p.id+'" style="left:'+ps[0]+'%;top:'+ps[1]+'%" aria-label="'+p.name+' 기사님"><span class="av">'+p.av+'</span><span class="nm">'+p.name+' <span class="st">★'+p.star+'</span></span></button>'}).join('');
+    h+='<span class="mapsrc">지도 예시 화면</span>';
+    $('lmap').innerHTML=h;
+    $('mapSel').innerHTML=sel?'<button class="selcard" data-open="'+sel.id+'"><span class="pav">'+sel.av+'</span><span style="flex:1"><b>'+sel.name+' 기사님</b><small>★ '+sel.star+' · 리뷰 '+sel.cnt+' · '+sel.eq.join('·')+' · '+sel.km+'km</small><small>점선 원은 기사님 활동 지역이에요</small></span><svg class="i" style="color:var(--orange)"><use href="#i-next"/></svg></button>'
+      :'<p class="demo-note" style="text-align:center;margin:0 0 6px">기사님 사진을 누르면 정보가 보여요</p>';
+  }
+  $('lmap').addEventListener('click',function(e){var b=e.target.closest('[data-pin]');if(!b)return;mapSelId=b.dataset.pin;renderMap()});
+  $('mapSel').addEventListener('click',function(e){var b=e.target.closest('[data-open]');if(!b)return;renderPro(b.dataset.open);go('pro')});
+  $('lview').querySelectorAll('button').forEach(function(b){b.onclick=function(){$('lview').querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});var m=b.dataset.v==='map';$('mapWrap').hidden=!m;$('plist').hidden=m;renderMap()}});
+  var _rl=renderList;renderList=function(){_rl();renderMap();var n=$('plist').querySelectorAll('.pcard').length;$('listHead').textContent=n?'근처 기사님 '+n+'명':''};
+  $('toLocal').onclick=function(){renderList();go('local')};
+
+  // 매칭 메시지 / 결과 기사님
+  function matchMsgs(){
+    var p=findPro(state.pref||CAT.pro);
+    if(state.pref)return [p.name+' 기사님께 먼저 호출을 보냈어요','기사님이 호출을 확인하고 있어요',p.name+' 기사님이 수락했어요!'];
+    return ['근처 '+CAT.proLabel+' 기사님 7명 화면에 호출이 떴어요','3명이 호출 내용을 보고 있어요',findPro(CAT.pro).name+' 기사님이 가장 먼저 잡았어요 (1분 12초)'];
+  }
+  function applyTech(){
+    var p=findPro(state.pref||CAT.pro);
+    $('dAv').innerHTML=p.av;$('rvAv').innerHTML=p.av;$('dName').textContent=p.name+' 기사님';$('rvName').textContent=p.name;
+    $('dMeta').textContent=p.eq.join('·')+' '+p.yrs+'년 · '+p.km+'km';$('dStar').textContent='★ '+p.star;$('dCnt').textContent='리뷰 '+p.cnt+'개';
+    $('dPraise').innerHTML=Object.keys(p.tags).map(function(k){return '<span>'+k+'<b>'+p.tags[k]+'</b></span>'}).join('');
+    $('dLast').textContent='“'+p.rv[0][2]+'” · '+p.rv[0][0]+' 사장님';
+  }
+  var HEAD={local:['우리 동네 기사님','home'],pro:['기사님 프로필','local']};
+  var _go2=go;go=function(id){
+    _go2(id);
+    if(id==='done')applyTech();
+    if(HEAD[id]){$('stepHead').hidden=false;$('progress').hidden=true;$('stepTitle').textContent=HEAD[id][0];$('stepCount').textContent='';$('bar').style.display='none';}
+    if(id==='1'&&state.pref){$('stepCount').textContent='1 / 4 · '+findPro(state.pref).name+' 기사님께 요청';}
+  };
+  $('backBtn').onclick=function(){if(HEAD[cur]){if(cur==='local')state.pref=null;go(HEAD[cur][1]);return}var b={'1':state.pref?'pro':'home','2':'1','3':'2','4':'3',sum:'4'};if(b[cur])go(b[cur])};
+  $('toReview').onclick=function(){go('review')};
+  // ================= CATEGORIES =================
+  var SAMPLE_FRIDGE=SAMPLE;
+  function svgScene(bg,body){return '<svg class="shot" viewBox="0 0 400 330" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="330" fill="'+bg+'"/>'+body+'</svg>'}
+  function lbl(lines,head,hc){var y=110;return '<rect x="70" y="60" width="260" height="210" rx="8" fill="#F4F4F0"/><rect x="70" y="60" width="260" height="38" rx="8" fill="'+hc+'"/><rect x="70" y="88" width="260" height="10" fill="'+hc+'"/><text x="88" y="86" font-size="17" font-weight="700" fill="#fff" font-family="sans-serif">'+head+'</text>'+lines.map(function(l){y+=26;return '<text x="88" y="'+y+'" font-size="13" fill="#333" font-family="monospace">'+l+'</text>'}).join('')}
+  function disp(code,c){return '<rect x="92" y="96" width="216" height="138" rx="14" fill="#2A2E33"/><rect x="104" y="108" width="192" height="114" rx="8" fill="#0D1410"/><text x="200" y="192" font-size="66" text-anchor="middle" fill="'+(c||'#FF4A26')+'" font-family="monospace" font-weight="700">'+code+'</text>'}
+  var EQ_SHOTS=function(a,b,c){return [
+    ['전체를 찍어주세요','한 발 물러나서 '+a+' 전체가 나오게 찍으면 돼요.','전체가 들어오게','AI 분석 중'],
+    ['라벨을 가까이 찍어주세요',b,'글자가 선명하게 보이게','라벨 읽는 중'],
+    ['에러코드가 떠 있나요?',c,'표시창이 잘 보이게','코드 해석 중']]};
+  var SPOT_SHOTS=function(a,b,c){return [
+    [a[0],a[1],a[2],'AI 분석 중'],[b[0],b[1],b[2],'가까이 분석 중'],[c[0],c[1],c[2],'피해 범위 확인 중']]};
+  var CATS={
+    fridge:{n:'냉장·냉동고',d:'쇼케이스·냉동고',ic:'fridge',g:['fridge','doc','thermo'],kind:'eq',pro:'kim',proLabel:'냉장·냉동',urg:'재료 손실 위험',
+      shots:EQ_SHOTS('기계','보통 문 안쪽 옆면이나 뒷면에 붙어 있어요.','온도 표시창에 E1, F3 같은 코드가 보이면 찍어주세요.'),
+      read1:[['장비 종류','업소용 냉장고 (양문형)']],label:[['제조사','LG전자'],['모델명','C1100'],['냉매','R-134a'],['제조일','2021년 4월']],
+      code:{c:'E1',m:'냉장실 온도 센서 이상',cause:'온도 센서 이상 (E1 코드)',part:'온도 센서',cost:[40000,90000]},equip:['LG 업소용 냉장고 C1100','2021년식 · R-134a'],
+      sample:SAMPLE_FRIDGE,sym:SYMPTOMS},
+    boiler:{n:'보일러·온수기',d:'온수·난방 고장',ic:'flame',g:['flame','doc','thermo'],kind:'eq',pro:'oh',proLabel:'보일러',urg:'영업 중 온수 끊김',
+      shots:EQ_SHOTS('보일러','보일러 앞면 아래쪽이나 옆면에 붙어 있어요.','보일러나 실내 온도조절기 화면에 숫자 코드가 보이면 찍어주세요.'),
+      read1:[['장비 종류','가스 보일러 (벽걸이형)']],label:[['제조사','경동나비엔'],['모델명','NCB553-20K'],['연료','LNG'],['제조일','2019년 11월']],
+      code:{c:'03',m:'점화 불량',cause:'점화 불량 (03 에러)',part:'점화 플러그',cost:[50000,120000]},equip:['경동나비엔 가스보일러 NCB553','2019년식 · LNG'],
+      sample:{1:svgScene('#3A3530','<rect x="130" y="40" width="140" height="210" rx="12" fill="#E8E8E4"/><rect x="160" y="70" width="80" height="34" rx="5" fill="#0D1410"/><text x="200" y="95" font-size="20" text-anchor="middle" fill="#FF4A26" font-family="monospace" font-weight="700">03</text><g stroke="#888" stroke-width="6"><line x1="160" y1="250" x2="160" y2="300"/><line x1="200" y1="250" x2="200" y2="300"/><line x1="240" y1="250" x2="240" y2="300"/></g>'),2:svgScene('#C9CDD2',lbl(['MODEL  NCB553-20K','FUEL   LNG','MFD    2019.11','220V 60Hz'],'경동나비엔','#1E4E9A')),3:svgScene('#B3B8BE',disp('03'))},
+      sym:[{k:'hot',i:'drop',t:'온수가 안 나와요',causes:['점화 불량','온수 열교환기 막힘'],parts:['점화 플러그'],cost:[50000,150000],urgent:true},
+           {k:'heat',i:'thermo',t:'난방이 안 돼요',causes:['순환 펌프 이상','난방 배관 공기 참'],parts:['순환 펌프'],cost:[80000,250000],urgent:true},
+           {k:'leak',i:'drop',t:'보일러 밑에 물이 새요',causes:['배관 연결부 누수','안전밸브 이상'],parts:['배관 패킹'],cost:[40000,120000]},
+           {k:'noise',i:'sound',t:'소리가 커요',causes:['순환 펌프 소음','버너 연소 불량'],parts:[],cost:[50000,120000]},
+           {k:'gas',i:'flame',t:'가스 냄새가 나요',causes:['가스 배관 누설 의심'],parts:[],cost:[0,80000],urgent:true,danger:true},
+           {k:'etc',i:'help',t:'잘 모르겠어요',causes:['현장 점검 필요'],parts:[],cost:[0,50000]}]},
+    vent:{n:'환풍기·덕트',d:'후드·환풍구·고깃집 덕트',ic:'fan',g:['fan','fan','img'],kind:'spot',pro:'bae',proLabel:'환풍기·덕트',urg:'연기로 영업 중단 위험',ins:true,
+      shots:SPOT_SHOTS(['후드와 환풍기를 찍어주세요','주방 후드나 테이블 환풍구 전체가 나오게요.','후드·환풍구 전체'],['팬이나 모터를 가까이 찍어주세요','멈춘 팬, 기름때, 소리 나는 부분을 가까이에서요.','팬·모터를 크게'],['바깥 환풍구를 찍어주세요','건물 밖 덕트 출구가 보이면 찍어주세요. 없으면 건너뛰어도 돼요.','덕트 출구']),
+      read1:[['장비','주방 후드 + 덕트 환풍기']],label:[['상태','팬 회전 느림'],['추정 원인','모터 베어링 마모 · 기름때']],read3:[['덕트 출구','기름때 많음'],['확인','덕트 청소 필요 가능성']],
+      code:null,equip:['주방 후드·덕트 환풍기','팬 회전 느림 · 모터 의심'],
+      sample:{1:svgScene('#3A3530','<path d="M90 60 h220 l40 90 h-300z" fill="#B7BDC3"/><rect x="170" y="10" width="60" height="50" fill="#8A9098"/><rect y="250" width="400" height="80" fill="#2A2622"/><g fill="#555"><rect x="120" y="150" width="160" height="6"/></g>'),2:svgScene('#2A2E33','<circle cx="200" cy="165" r="110" fill="#5A5F66"/><circle cx="200" cy="165" r="18" fill="#2A2E33"/>'+[0,90,180,270].map(function(a){return '<ellipse cx="200" cy="105" rx="26" ry="56" fill="#8A7A5A" transform="rotate('+a+' 200 165)"/>'}).join('')),3:svgScene('#9AA0A6','<rect y="0" width="400" height="330" fill="#B9AE9E"/><rect x="140" y="100" width="120" height="120" fill="#4A4F56"/><g stroke="#2A2E33" stroke-width="6">'+[0,1,2,3,4].map(function(i){return '<line x1="140" x2="260" y1="'+(115+i*22)+'" y2="'+(115+i*22)+'"/>'}).join('')+'</g><ellipse cx="200" cy="230" rx="70" ry="14" fill="#5A4A2A" opacity=".6"/>')},
+      sym:[{k:'stop',i:'fan',t:'환풍기가 안 돌아가요',causes:['모터 고장','콘덴서(기동장치) 불량'],parts:['환풍기 모터'],cost:[80000,250000],urgent:true},
+           {k:'smoke',i:'wind',t:'연기가 잘 안 빠져요',causes:['덕트 기름때 막힘','팬 회전 저하'],parts:[],cost:[100000,350000],urgent:true},
+           {k:'noise',i:'sound',t:'소리가 크고 떨려요',causes:['모터 베어링 마모','팬 날개 기름때 불균형'],parts:['베어링'],cost:[60000,150000]},
+           {k:'oil',i:'drop',t:'후드에서 기름이 떨어져요',causes:['필터 포화','기름받이 넘침'],parts:['후드 필터'],cost:[40000,120000]},
+           {k:'clean',i:'fan',t:'덕트 청소가 필요해요',causes:['덕트 내부 기름때 축적'],parts:[],cost:[150000,500000],info:'<b>고깃집 덕트는 정기 청소를 권해요</b>덕트에 기름이 쌓이면 화재 위험이 커져요. 청소 전후 사진을 남겨두면 화재보험 점검 때도 쓸 수 있어요.'},
+           {k:'fire',i:'flame',t:'덕트에서 타는 냄새가 나요',causes:['덕트 기름때 과열'],parts:[],cost:[0,100000],urgent:true,danger:true,msg:'<b>덕트 화재 위험이 있어요</b>바로 불을 끄고 환풍기를 멈춰주세요. 연기나 불꽃이 보이면 밖으로 나가서 119에 먼저 신고하세요.'}]},
+    toilet:{n:'화장실·변기',d:'변기·세면대·소변기',ic:'toilet',g:['toilet','drop','img'],kind:'spot',pro:'han',proLabel:'화장실·배관',urg:'손님 화장실 사용 불가',ins:true,
+      shots:SPOT_SHOTS(['변기나 세면대를 찍어주세요','문제 있는 변기·세면대 전체가 나오게요.','변기·세면대 전체'],['물 상태를 가까이 찍어주세요','물이 차오른 높이나 새는 부분이 보이게요.','물 높이·새는 곳'],['물탱크나 바닥을 찍어주세요','물탱크 뚜껑을 열어 안쪽을 찍거나, 바닥에 물이 새면 찍어주세요.','물탱크 안·바닥']),
+      read1:[['장비','양변기 (물탱크형)']],label:[['상태','물이 차오름'],['추정 원인','변기 배관 막힘']],read3:[['물탱크','부속 정상'],['바닥','물샘 없음']],
+      code:null,equip:['손님 화장실 양변기','물 차오름 · 배관 막힘 의심'],
+      sample:{1:svgScene('#E5E8EB','<rect x="150" y="40" width="100" height="90" rx="8" fill="#FAFAFA" stroke="#ccc"/><ellipse cx="200" cy="190" rx="90" ry="55" fill="#FAFAFA" stroke="#ccc"/><ellipse cx="200" cy="185" rx="60" ry="32" fill="#A9C9E0"/><rect x="175" y="240" width="50" height="60" fill="#F0F0F0"/>'),2:svgScene('#E5E8EB','<ellipse cx="200" cy="165" rx="170" ry="110" fill="#FAFAFA" stroke="#ccc"/><ellipse cx="200" cy="160" rx="130" ry="76" fill="#9DB8C9"/><ellipse cx="200" cy="150" rx="90" ry="30" fill="#B7CEDB"/>'),3:svgScene('#D5D8DC','<rect x="80" y="60" width="240" height="210" rx="10" fill="#F4F4F0"/><rect x="110" y="120" width="180" height="120" fill="#A9C9E0"/><rect x="180" y="80" width="14" height="120" fill="#888"/><circle cx="240" cy="150" r="22" fill="#C8C8C8"/>')},
+      sym:[{k:'clog',i:'toilet',t:'변기가 막혔어요',causes:['변기 배관 막힘','이물질 걸림'],parts:[],cost:[50000,150000],urgent:true},
+           {k:'run',i:'drop',t:'물이 계속 흘러요',causes:['물탱크 부속(볼탑·플래퍼) 고장'],parts:['물탱크 부속'],cost:[40000,100000]},
+           {k:'leak',i:'drop',t:'변기 밑으로 물이 새요',causes:['변기 바닥 실링 손상','급수 호스 누수'],parts:['변기 실링'],cost:[60000,180000],urgent:true},
+           {k:'sink',i:'pipe',t:'세면대·소변기가 막혔어요',causes:['배수관 막힘'],parts:[],cost:[40000,120000]},
+           {k:'smell',i:'help',t:'화장실 냄새가 심해요',causes:['배수 트랩 봉수 마름','바닥 배수구 틈'],parts:['트랩 부품'],cost:[40000,100000]}]},
+    leak:{n:'누수',d:'천장·벽·바닥 물샘',ic:'drop',g:['drop','drop','img'],kind:'spot',pro:'han',proLabel:'누수 탐지',urg:'피해 확산 위험',ins:true,
+      shots:SPOT_SHOTS(['물이 새는 곳을 찍어주세요','천장, 벽, 바닥 중 물이 보이는 곳 전체가 나오게요.','물 자국 전체가 보이게'],['가까이 한 장 더 찍어주세요','물방울이나 곰팡이, 들뜬 부분을 가까이에서요.','젖은 부분을 크게'],['피해 범위를 찍어주세요','젖은 물건이나 아래층·옆 가게 피해가 있으면 찍어두세요. 보험 처리에 써요.','피해 입은 곳 전체']),
+      read1:[['문제 유형','천장 누수 의심'],['위치','주방 천장 모서리']],label:[['물 자국 범위','약 50cm'],['추정 원인','위층 배관 또는 방수층']],read3:[['피해 범위','바닥 일부 젖음'],['보험 처리','서류가 필요할 수 있어요']],
+      code:null,equip:['주방 천장 누수','물 자국 약 50cm · 위층 배관 의심'],
+      sample:{1:svgScene('#E9E6E0','<ellipse cx="220" cy="80" rx="120" ry="55" fill="#B8A98C" opacity=".55"/><ellipse cx="210" cy="78" rx="70" ry="30" fill="#8C7B5E" opacity=".5"/><path d="M215 110 q4 18 0 30 q-4 -12 0 -30z" fill="#6E9EC8"/><rect y="250" width="400" height="80" fill="#CFC8BC"/>'),2:svgScene('#D9D3C8','<ellipse cx="200" cy="140" rx="150" ry="90" fill="#9C8B6C" opacity=".6"/><circle cx="160" cy="150" r="8" fill="#4F6E4A"/><circle cx="240" cy="120" r="6" fill="#4F6E4A"/><path d="M200 200 q8 30 0 50 q-8 -20 0 -50z" fill="#6E9EC8"/>'),3:svgScene('#CFC8BC','<ellipse cx="200" cy="230" rx="160" ry="50" fill="#6E9EC8" opacity=".45"/><rect x="60" y="110" width="80" height="90" fill="#8A6A4A"/><rect x="250" y="130" width="70" height="70" fill="#A8A8A8"/>')},
+      sym:[{k:'ceil',i:'drop',t:'천장에서 물이 떨어져요',causes:['위층 배관 누수','옥상 방수층 손상'],parts:[],cost:[100000,350000],urgent:true},
+           {k:'wall',i:'drop',t:'벽이 젖고 곰팡이가 펴요',causes:['벽체 배관 누수','결로'],parts:[],cost:[80000,300000]},
+           {k:'floor',i:'drop',t:'바닥에 물이 고여요',causes:['바닥 배관 누수','배수 역류'],parts:[],cost:[100000,400000],urgent:true},
+           {k:'bill',i:'won',t:'수도 요금이 갑자기 늘었어요',causes:['숨은 배관 누수'],parts:[],cost:[80000,200000]},
+           {k:'down',i:'help',t:'아래층에서 물 샌다고 연락 왔어요',causes:['바닥 배관 또는 방수층 누수'],parts:[],cost:[100000,400000],urgent:true}]},
+    drain:{n:'하수구·배수 막힘',d:'싱크대·바닥 배수구',ic:'pipe',g:['pipe','pipe','img'],kind:'spot',pro:'han',proLabel:'하수구·배관',urg:'영업 중 역류 위험',ins:true,
+      shots:SPOT_SHOTS(['막힌 곳을 찍어주세요','싱크대, 바닥 배수구, 그리스트랩 중 막힌 곳 전체가 나오게요.','막힌 배수구 전체'],['물이 고인 상태를 찍어주세요','물이 얼마나 차 있는지 보이게 가까이에서요.','고인 물이 보이게'],['역류·피해가 있으면 찍어주세요','물이 넘친 바닥이나 옆 가게 피해가 있으면 찍어두세요.','피해 입은 곳 전체']),
+      read1:[['문제 유형','주방 바닥 배수구 막힘']],label:[['고인 물','배수구 위 약 5cm'],['추정 원인','기름때 응고 (그리스트랩)']],read3:[['피해 범위','주방 바닥 일부'],['보험 처리','이웃 피해가 있으면 서류 준비']],
+      code:null,equip:['주방 바닥 배수구 막힘','기름때 응고 의심'],
+      sample:{1:svgScene('#9AA0A6','<rect y="0" width="400" height="330" fill="#B7BDC3"/><circle cx="200" cy="170" r="60" fill="#3A3A3A"/><g stroke="#777" stroke-width="5"><line x1="150" y1="170" x2="250" y2="170"/><line x1="200" y1="120" x2="200" y2="220"/></g><ellipse cx="200" cy="175" rx="130" ry="70" fill="#7A6A3A" opacity=".45"/>'),2:svgScene('#8A8F94','<ellipse cx="200" cy="170" rx="170" ry="110" fill="#6B5B2E" opacity=".6"/><ellipse cx="180" cy="160" rx="40" ry="14" fill="#C9B26A" opacity=".7"/>'),3:svgScene('#B7BDC3','<ellipse cx="200" cy="240" rx="190" ry="60" fill="#6B5B2E" opacity=".45"/>')},
+      sym:[{k:'sink',i:'pipe',t:'싱크대 물이 안 내려가요',causes:['배수관 기름때 막힘'],parts:[],cost:[60000,150000],urgent:true},
+           {k:'floor',i:'pipe',t:'바닥 배수구가 역류해요',causes:['메인 배관 막힘','그리스트랩 포화'],parts:[],cost:[100000,300000],urgent:true},
+           {k:'smell',i:'help',t:'하수구 냄새가 심해요',causes:['트랩 봉수 마름','배관 이음부 틈'],parts:['트랩 부품'],cost:[40000,100000]}]},
+    sign:{n:'간판 수리',d:'LED·풍선간판',ic:'sign',g:['sign','plug','img'],kind:'spot',pro:'seo',proLabel:'간판·전기',urg:'저녁 영업 지장',ins:true,
+      shots:SPOT_SHOTS(['간판 전체를 찍어주세요','길 건너편에서 간판 전체가 나오게 찍으면 돼요.','간판 전체가 들어오게'],['안 들어오는 부분을 찍어주세요','꺼진 글자나 깜빡이는 부분을 가까이에서요.','문제 부분을 크게'],['전원·송풍기를 찍어주세요','간판 스위치나 타이머, 풍선간판이면 송풍기가 보이게 찍어주세요.','스위치·송풍기']),
+      read1:[['간판 종류','LED 채널 간판']],label:[['문제 부분','글자 2개 꺼짐'],['추정 원인','LED 모듈 또는 SMPS(전원장치)']],read3:[['전원','타이머 정상 작동'],['확인','SMPS 교체 가능성']],
+      code:null,equip:['LED 채널 간판','글자 2개 꺼짐 · 전원장치 의심'],
+      sample:{1:svgScene('#1E2228','<rect x="40" y="110" width="320" height="90" rx="8" fill="#2E333A"/><text x="200" y="172" font-size="44" text-anchor="middle" font-weight="700" font-family="sans-serif" fill="#FFB347">○○식</text><text x="292" y="172" font-size="44" text-anchor="middle" font-weight="700" font-family="sans-serif" fill="#555">당</text>'),2:svgScene('#2E333A','<text x="200" y="210" font-size="150" text-anchor="middle" font-weight="700" font-family="sans-serif" fill="#4A4F56">당</text>'),3:svgScene('#B3B8BE','<rect x="120" y="90" width="160" height="150" rx="10" fill="#E5E5E0"/><rect x="150" y="120" width="100" height="40" rx="4" fill="#0D1410"/><text x="200" y="148" font-size="18" text-anchor="middle" fill="#7CFC9A" font-family="monospace">18:00</text>')},
+      sym:[{k:'off',i:'sign',t:'간판 불이 아예 안 켜져요',causes:['전원장치(SMPS) 고장','타이머 고장'],parts:['SMPS'],cost:[80000,200000],urgent:true},
+           {k:'part',i:'sign',t:'일부 글자만 꺼졌어요',causes:['LED 모듈 불량'],parts:['LED 모듈'],cost:[60000,150000]},
+           {k:'blink',i:'bolt',t:'깜빡거려요',causes:['전원장치 노후','접촉 불량'],parts:['SMPS'],cost:[60000,150000]},
+           {k:'airup',i:'wind',t:'풍선간판이 안 서요',causes:['송풍기(블로워) 고장','전원 연결 불량'],parts:['풍선간판 송풍기'],cost:[50000,150000]},
+           {k:'airleak',i:'wind',t:'풍선간판 바람이 새거나 찢어졌어요',causes:['원단 찢어짐','지퍼·이음새 불량'],parts:['원단 수선 또는 교체'],cost:[30000,200000],info:'<b>풍선간판 수선 안내</b>작은 찢어짐은 현장에서 수선하고, 크게 찢어졌으면 원단을 새로 제작해요. 바람에 쓰러질 수 있으니 고정 끈도 같이 점검해드려요.'},
+           {k:'loose',i:'help',t:'간판이 흔들리거나 기울었어요',causes:['고정 브래킷 부식'],parts:['고정 브래킷'],cost:[100000,300000],urgent:true,danger:true}]},
+    elec:{n:'전기·차단기',d:'누전·정전·콘센트',ic:'plug',g:['plug','plug','img'],kind:'spot',pro:'seo',proLabel:'전기',urg:'영업 중단 위험',ins:true,
+      shots:SPOT_SHOTS(['차단기함을 찍어주세요','두꺼비집(분전반) 전체가 나오게 찍어주세요.','차단기함 전체'],['내려간 차단기를 찍어주세요','내려가 있거나 다시 안 올라가는 스위치를 가까이에서요.','문제 스위치를 크게'],['문제 콘센트를 찍어주세요','탄 자국이나 냄새가 나는 콘센트가 있으면 찍어주세요.','문제 콘센트']),
+      read1:[['장비','분전반 (차단기 12회로)']],label:[['내려간 차단기','주방 2번 회로'],['추정 원인','누전 또는 과부하']],read3:[['콘센트','그을음 흔적'],['확인','콘센트 교체 필요 가능성']],
+      code:null,equip:['주방 분전반','2번 회로 차단 · 누전 의심'],
+      sample:{1:svgScene('#C9CDD2','<rect x="100" y="40" width="200" height="250" rx="8" fill="#F0F0EC"/>'+[0,1,2,3,4,5].map(function(i){return '<rect x="'+(125+i*28)+'" y="110" width="20" height="44" rx="3" fill="#333"/><rect x="'+(129+i*28)+'" y="'+(i===2?136:114)+'" width="12" height="14" fill="'+(i===2?'#FF4A26':'#9AE6B4')+'"/>'}).join('')),2:svgScene('#E5E5E0','<rect x="150" y="60" width="100" height="210" rx="10" fill="#333"/><rect x="170" y="190" width="60" height="60" rx="6" fill="#FF4A26"/>'),3:svgScene('#E9E6E0','<rect x="140" y="90" width="120" height="150" rx="14" fill="#F7F7F3" stroke="#ccc"/><circle cx="180" cy="165" r="10" fill="#333"/><circle cx="220" cy="165" r="10" fill="#333"/><ellipse cx="200" cy="150" rx="50" ry="30" fill="#3A2A20" opacity=".35"/>')},
+      sym:[{k:'trip',i:'bolt',t:'차단기가 자꾸 내려가요',causes:['누전','과부하'],parts:['누전차단기'],cost:[60000,180000],urgent:true},
+           {k:'dead',i:'power',t:'일부 전기가 안 들어와요',causes:['회로 단선','차단기 불량'],parts:['차단기'],cost:[50000,150000],urgent:true},
+           {k:'burn',i:'flame',t:'콘센트가 탔거나 탄 냄새가 나요',causes:['접촉 불량 과열'],parts:['콘센트'],cost:[40000,100000],urgent:true,danger:true}]},
+    shutter:{n:'셔터·도어락',d:'전동셔터·유리문',ic:'shutter',g:['shutter','shutter','img'],kind:'spot',pro:'yoon',proLabel:'셔터·도어락',urg:'마감·보안 문제',
+      shots:SPOT_SHOTS(['셔터나 문 전체를 찍어주세요','멈춘 위치가 보이게 전체를 찍어주세요.','문 전체가 들어오게'],['모터나 스위치를 찍어주세요','셔터 스위치나 리모컨, 도어락 화면을 가까이에서요.','스위치·화면'],['걸린 부분을 찍어주세요','레일이 휘었거나 걸린 곳이 보이면 찍어주세요.','걸린 부분']),
+      read1:[['장비','전동 셔터 (폭 약 4m)']],label:[['상태','중간에서 멈춤'],['추정 원인','모터 과열 또는 리밋 스위치']],read3:[['레일','한쪽 휨'],['확인','레일 교정 필요']],
+      code:null,equip:['전동 셔터','중간 멈춤 · 모터 의심'],
+      sample:{1:svgScene('#5A5F66','<rect x="50" y="40" width="300" height="160" fill="#B7BDC3"/>'+[0,1,2,3,4,5,6].map(function(i){return '<line x1="50" x2="350" y1="'+(60+i*22)+'" y2="'+(60+i*22)+'" stroke="#8A9098" stroke-width="3"/>'}).join('')+'<rect x="50" y="200" width="300" height="130" fill="#2A2E33"/>'),2:svgScene('#D5D8DC','<rect x="150" y="80" width="100" height="170" rx="10" fill="#F4F4F0"/><circle cx="200" cy="130" r="18" fill="#3A8A5A"/><circle cx="200" cy="200" r="18" fill="#C84A3A"/>'),3:svgScene('#5A5F66','<path d="M180 20 L190 330" stroke="#B7BDC3" stroke-width="16"/><path d="M190 140 q20 20 0 40" stroke="#FF6B00" stroke-width="5" fill="none"/>')},
+      sym:[{k:'stuck',i:'shutter',t:'셔터가 중간에 멈췄어요',causes:['모터 과열','리밋 스위치 이상'],parts:['리밋 스위치'],cost:[80000,200000],urgent:true},
+           {k:'nomove',i:'power',t:'셔터가 아예 안 움직여요',causes:['모터 고장','스위치·리모컨 고장'],parts:['셔터 모터'],cost:[150000,450000],urgent:true},
+           {k:'lock',i:'door',t:'도어락이 안 열려요',causes:['배터리 방전','도어락 고장'],parts:['도어락'],cost:[50000,250000],urgent:true},
+           {k:'glass',i:'door',t:'유리문이 안 닫혀요',causes:['도어 클로저(힌지) 고장'],parts:['플로어 힌지'],cost:[80000,250000]}]}
+  };
+  var CAT=CATS.fridge;
+  var CAT_ORDER=['fridge','vent','toilet','drain','leak','boiler','sign','elec','shutter'];
+  CAT_ORDER.forEach(function(k){var c=CATS[k];var b=document.createElement('button');b.className='cat';b.innerHTML='<span class="ic">'+ico(c.ic)+'</span><b>'+c.n+'</b><small>'+c.d+'</small>';b.onclick=function(){setCat(k)};$('catgrid').appendChild(b)});
+
+  function kv(rows){return '<div class="kv">'+rows.map(function(r){return '<span>'+r[0]+'</span><b>'+r[1]+'</b>'}).join('')+'</div>'}
+  function readShot(slot){
+    if(slot==='1'){$('r1').innerHTML='<div class="readout"><div class="readhead">'+ck+(CAT.kind==='eq'?'장비를 확인했어요':'문제 위치를 확인했어요')+'</div>'+kv(CAT.read1)+'</div>'+note}
+    else if(slot==='2'){state.label=true;$('r2').innerHTML='<div class="readout"><div class="readhead">'+ck+(CAT.kind==='eq'?'라벨을 읽었어요':'가까이 분석했어요')+'</div>'+kv(CAT.label)+'</div>'+note}
+    else{state.code=CAT.code?CAT.code.c:'ok';$('r3').innerHTML='<div class="readout"><div class="readhead">'+ck+(CAT.code?'에러코드를 읽었어요':'확인했어요')+'</div>'+kv(CAT.code?[['코드',CAT.code.c],['의미',CAT.code.m]]:CAT.read3)+'</div>'+note}
+  }
+  function sampleFor(slot){return CAT.sample[slot]}
+  function setCat(k){
+    CAT=CATS[k];SYMPTOMS=CAT.sym;
+    state.img={};state.label=false;state.code=null;state.sym=new Set();state.insHarm=null;$('memo').value='';
+    ['1','2','3'].forEach(function(n,i){
+      var sh=CAT.shots[i],f=$('f'+n);
+      $('t'+n).textContent=sh[0];$('l'+n).textContent=sh[1];
+      var o=f.querySelector('.shot');if(o)o.remove();
+      f.querySelector('.ghost').style.display='';f.querySelector('.ghost').innerHTML=ico(CAT.g[i]);
+      f.querySelector('.hint').style.display='';f.querySelector('.hint').textContent=sh[2];f.querySelector('.ai').textContent=sh[3];
+      $('r'+n).innerHTML='';
+    });
+    $('cp1').innerHTML=ico(CAT.ic)+CAT.n;
+    $('skip3').textContent=CAT.kind==='eq'?'코드가 없어요, 건너뛸게요':'해당 없어요, 건너뛸게요';
+    var ch=$('chips');ch.innerHTML='';
+    SYMPTOMS.forEach(function(sy){var b=document.createElement('button');b.className='chip';b.setAttribute('aria-pressed','false');b.innerHTML='<span class="ic">'+ico(sy.i)+'</span><b>'+sy.t+'</b>';
+      b.onclick=function(){var on=state.sym.has(sy.k);on?state.sym.delete(sy.k):state.sym.add(sy.k);b.setAttribute('aria-pressed',String(!on));updateBar();renderDanger()};ch.appendChild(b)});
+    var dz=$('danger');if(dz)dz.remove();
+    go('1');
+  }
+  function renderDanger(){
+    var d=SYMPTOMS.filter(function(x){return x.danger&&state.sym.has(x.k)})[0];var el=$('danger');
+    var inf=!d&&SYMPTOMS.filter(function(x){return x.info&&state.sym.has(x.k)})[0];
+    if(!d&&!inf){if(el)el.remove();return}
+    if(!el){el=document.createElement('div');el.id='danger';$('chips').after(el)}
+    el.className=d?'safety':'safety info';
+    if(inf){el.innerHTML=inf.info;return}
+    el.innerHTML=d.msg?d.msg:d.k==='gas'?'<b>가스 냄새가 나면 먼저 이렇게 하세요</b>가스 중간밸브를 잠그고, 창문을 열고, 전기 스위치는 건드리지 마세요. 냄새가 심하면 밖으로 나가서 가스회사 긴급번호로 먼저 신고하세요.'
+      :d.k==='burn'?'<b>탄 냄새가 나면 먼저 이렇게 하세요</b>해당 콘센트 플러그를 뽑고, 그 회로 차단기를 내려주세요. 연기가 나면 119에 먼저 신고하세요.'
+      :'<b>떨어질 위험이 있어요</b>간판 아래로 사람이 지나가지 않게 막아주세요. 위험해 보이면 119에 먼저 신고하세요.';
+  }
+  // 보험 카드
+  function insCard(){
+    if(!CAT.ins)return '';
+    return '<div class="card inscard"><div class="lab">'+ico('doc')+' 다른 집·가게에 피해가 있나요?</div><div class="yn"><button data-harm="y" aria-pressed="'+(state.insHarm==='y')+'">있어요</button><button data-harm="n" aria-pressed="'+(state.insHarm==='n')+'">없어요</button></div>'+
+      (state.insHarm==='y'?'<p>기사님이 <b>보험 청구용 서류</b>(원인 소견서, 수리 전후 사진, 수리 확인서, 영수증)를 함께 준비해드려요. 어떤 보험이 적용되는지는 가입하신 보험사에서 최종 판단해요.</p>':'')+'</div>';
+  }
+  $('sumBody').addEventListener('click',function(e){var b=e.target.closest('[data-harm]');if(!b)return;state.insHarm=b.dataset.harm;renderSummary()});
+  // 평가 완료 화면에 서류 카드
+  var _rt=renderThanks;renderThanks=function(){_rt();
+    var extra='<div class="card"><div class="lab">작업 중 피해 보상</div><span style="font-size:14.5px">수리 중 생긴 피해는 기사님의 배상책임보험으로 처리돼요.</span></div>';
+    if(state.insHarm==='y')extra='<div class="card"><div class="lab">보험 청구 서류</div><span style="font-size:14.5px">보험사에 그대로 제출하실 수 있어요.</span><div class="docs">'+
+      ['수리 확인서','누수·고장 원인 소견서','수리 전후 사진 (6장)','결제 영수증·세금계산서'].map(function(t){return '<button onclick="window.__toast(\'데모: PDF로 내려받거나 카톡으로 보내요\')">'+ico('doc')+t+'</button>'}).join('')+'</div></div>'+extra;
+    $('rvPreview').insertAdjacentHTML('afterend','<div id="thxExtra">'+extra+'</div>');
+  };
+  window.__toast=function(m){alert(m)};
+  HEAD.cat=['고장 종류','home'];
+  var _go4=go;go=function(id){var x=$('thxExtra');if(x&&id!=='thanks')x.remove();_go4(id)};
+
+  // ================= OTHER SERVICES =================
+  var XHEAD={'q-type':['견적 받기','home'],'q-form':['견적 요청','q-type'],'q-wait':['견적 요청 완료','home'],'q-list':['받은 견적','home'],
+    'u-home':['중고 장터','home'],'u-item':['장비 상세','u-home'],'m-form':['운반·설치','home'],'x-ok':['완료','home']};
+  document.querySelectorAll('[data-svc]').forEach(function(b){b.onclick=function(){if(b.dataset.svc==='m-form')mPrefill(null);go(b.dataset.svc)}});
+  function segInit(id,cb){var el=$(id);el.querySelectorAll('button').forEach(function(b){b.onclick=function(){el.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});cb&&cb(b)}})}
+  function segVal(id){var b=$(id).querySelector('[aria-pressed="true"]');return b?(b.dataset.v!=null?b.dataset.v:b.textContent):''}
+  function tile(ic,c1,c2){return '<svg viewBox="0 0 120 100"><defs><linearGradient id="g'+ic+c1.slice(1)+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+c1+'"/><stop offset="1" stop-color="'+c2+'"/></linearGradient></defs><rect width="120" height="100" fill="url(#g'+ic+c1.slice(1)+')"/><svg x="38" y="24" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-'+ic+'"/></svg></svg>'}
+
+  // ---- QUOTE ----
+  var QT={
+    sign:{n:'간판 제작·천갈이',d:'새 간판, 천 교체',ic:'sign',size:'간판 크기 (가로 × 세로)',ph:'예: 4m × 0.9m',ext:['디자인 파일 있어요','시안 제작 필요해요','기존 간판 철거 포함','야간 시공 희망'],
+      q:[['바른간판','#2F64C7',4.9,128,480000,'4일',['시안 2회 수정','설치·기존 천 수거','A/S 1년'],'같은 크기면 프레임 재사용해서 저렴하게 가능합니다.'],
+         ['스마일사인','#1F8A55',4.8,96,550000,'3일',['시안 3회 수정','LED 점검 포함','A/S 1년'],'LED 상태도 같이 봐드릴게요.'],
+         ['○○애드','#8A3FC2',4.7,61,620000,'5일',['고급 원단(방수)','시안 무제한','A/S 2년'],'원단을 고급형으로 쓰면 변색이 훨씬 늦어요.']]},
+    demo:{n:'철거·원상복구',d:'매장 철거, 폐업 정리',ic:'wrench',size:'면적',ph:'예: 20평',ext:['폐기물 처리 포함','주방 장비 중고 매입 같이','원상복구 (임대인 요청)','주말 작업 희망'],
+      q:[['깔끔철거','#2F64C7',4.8,210,2800000,'2일',['폐기물 처리','원상복구 기본','작업 전후 사진'],'중고로 팔 수 있는 장비는 매입가에서 빼드려요.'],
+         ['원상복구119','#C2410C',4.9,175,3200000,'2일',['폐기물 처리','임대인 확인 동행','하자 보수 1개월'],'임대인 확인까지 책임지고 마무리합니다.'],
+         ['다온철거','#1F8A55',4.6,88,3500000,'3일',['폐기물 처리','덕트·가스 배관 철거','보험 가입 업체'],'덕트와 가스 배관까지 안전하게 철거합니다.']]},
+    interior:{n:'인테리어·리모델링',d:'매장 공사',ic:'box',size:'면적',ph:'예: 25평',ext:['디자인 상담 필요','주방 설비 포함','간판 같이','영업하면서 공사'],
+      q:[['모던공간','#2F64C7',4.8,64,28000000,'4주',['3D 시안 제공','주방 설비 연계','하자 보수 1년'],'현장 실측 후 3D 시안을 먼저 보여드릴게요.'],
+         ['오픈키친디자인','#C2410C',4.9,52,32000000,'5주',['외식업 전문','동선 설계','하자 보수 2년'],'식당 동선 설계를 전문으로 합니다.'],
+         ['한결인테리어','#1F8A55',4.7,40,30500000,'4주',['자재 등급 선택','공정표 공유','하자 보수 1년'],'공정표를 매주 공유해드려요.']]},
+    kitchen:{n:'주방 설비 공사',d:'후드·덕트·가스 배관',ic:'flame',size:'공사 범위',ph:'예: 후드 3m + 덕트 10m',ext:['가스 안전점검 포함','기존 설비 철거','야간 공사 희망'],
+      q:[['후드마스터','#2F64C7',4.8,140,1800000,'2일',['후드 스테인리스','덕트 청소 1회','A/S 1년'],'후드와 덕트 같이 하면 할인됩니다.'],
+         ['안전가스설비','#C2410C',4.9,98,2100000,'2일',['가스 배관 자격','안전점검 동행','A/S 1년'],'가스 배관은 자격 보유 기사가 직접 시공해요.'],
+         ['청정덕트','#1F8A55',4.7,77,2400000,'3일',['방화 댐퍼','소음 저감','A/S 2년'],'소음이 적은 송풍기로 시공합니다.']]}
+  };
+  var qk='sign',qphotos=0,qext=new Set();
+  Object.keys(QT).forEach(function(k){var c=QT[k];var b=document.createElement('button');b.className='cat';b.innerHTML='<span class="ic">'+ico(c.ic)+'</span><b>'+c.n+'</b><small>'+c.d+'</small>';b.onclick=function(){qSet(k);go('q-form')};$('qgrid').appendChild(b)});
+  function qSet(k){qk=k;var c=QT[k];qphotos=0;qext=new Set();
+    $('qpill').innerHTML=ico(c.ic)+c.n;$('qsizeL').textContent=c.size;$('qsize').placeholder=c.ph;$('qsize').value='';$('qmemo').value='';
+    $('qext').innerHTML='';c.ext.forEach(function(t){var b=document.createElement('button');b.textContent=t;b.setAttribute('aria-pressed','false');b.onclick=function(){var on=qext.has(t);on?qext.delete(t):qext.add(t);b.setAttribute('aria-pressed',String(!on))};$('qext').appendChild(b)});
+    qRenderPh();}
+  function qRenderPh(){var c=QT[qk];var h='';for(var i=0;i<qphotos;i++)h+='<div class="ph">'+tile(c.ic,['#5A5F66','#6B5B4A','#3A4A5A','#4A3A3A'][i],'#22262B')+'</div>';
+    if(qphotos<4)h+='<label class="add" aria-label="사진 추가"><input type="file" accept="image/*" capture="environment" id="qin">'+ico('cam')+'</label>';
+    $('qph').innerHTML=h+(qphotos===0?'<button class="mini2" id="qsamp" style="align-self:center;font-size:13.5px;color:var(--orange);font-weight:600;text-decoration:underline">샘플 사진 넣기</button>':'');
+    var qin=$('qin');if(qin)qin.onchange=function(){if(qin.files&&qin.files[0]){qphotos++;qRenderPh();updateBar()}};
+    var qs=$('qsamp');if(qs)qs.onclick=function(){qphotos=3;qRenderPh();updateBar()};}
+  segInit('qwhen');
+  $('qsize').addEventListener('input',function(){updateBar()});
+  BAR['q-form']=['견적 요청 보내기',function(){return qphotos>0&&$('qsize').value.trim()}];
+  NEXT['q-form']='q-wait';
+  BAR['q-wait']=['데모: 견적 도착 화면 보기',function(){return true}];NEXT['q-wait']='q-list';
+  function qRenderList(){
+    var c=QT[qk],min=Math.min.apply(null,c.q.map(function(x){return x[4]})),top=Math.max.apply(null,c.q.map(function(x){return x[2]}));
+    $('qlistT').textContent=c.n+' 견적 3개가 도착했어요';
+    $('qlist').innerHTML=c.q.map(function(v,i){return '<div class="qc'+(v[4]===min?' best':'')+'"><div class="top"><span class="logo" style="background:'+v[1]+'">'+v[0][0]+'</span><span style="flex:1"><span class="nm">'+v[0]+'</span>'+(v[4]===min?'<span class="flag">최저가</span>':'')+(v[2]===top?'<span class="flag">평점 최고</span>':'')+'<div class="meta">★ '+v[2]+' · 찍꼬 시공 '+v[3]+'건 · 기간 '+v[5]+'</div></span></div>'+
+      '<div class="price">'+won(v[4])+'<span>원</span></div><ul>'+v[6].map(function(t){return '<li>'+t+'</li>'}).join('')+'</ul><q>'+v[7]+'</q>'+
+      '<div class="acts2"><button class="a" onclick="alert(\'데모: 업체와 채팅으로 문의할 수 있어요\')">채팅 문의</button><button class="b" data-qpick="'+i+'">이 업체로 할게요</button></div></div>'}).join('');
+  }
+  $('qlist').addEventListener('click',function(e){var b=e.target.closest('[data-qpick]');if(!b)return;var v=QT[qk].q[+b.dataset.qpick];
+    xOk('업체를 정했어요',v[0]+'에서 실측 방문 일정을 잡으려고 연락드릴 거예요.',
+      '<div class="card"><div class="mrow"><span>견적 금액</span><b>'+won(v[4])+'원</b></div><div class="mrow"><span>계약금 (30%)</span><b>'+won(Math.round(v[4]*.3/1000)*1000)+'원</b></div><div class="mrow"><span>잔금</span><b>공사 완료 확인 후</b></div></div>'+
+      '<div class="card"><div class="lab">안심 결제</div><span style="font-size:14.5px">계약금은 찍꼬가 보관하고 있다가, 공사가 끝나고 사장님이 확인하면 업체에 지급돼요. 실측 후 금액이 바뀌면 다시 확인받아요.</span></div>')});
+
+  // ---- USED ----
+  var UI=[
+    {id:1,c:'냉장고',n:'LG 업소용 냉장고 45박스',y:'2021년식',p:850000,g:'A',a:'망원동',f:'폐업 매장',ck:true,ic:'fridge',c1:'#7C8794'},
+    {id:2,c:'냉장고',n:'우성 반찬 냉장고 1500',y:'2019년식',p:420000,g:'B',a:'서교동',f:'찍꼬 매입',ck:true,ic:'fridge',c1:'#8A939E'},
+    {id:3,c:'제빙기',n:'호시자키 제빙기 50kg',y:'2020년식',p:980000,g:'A',a:'합정동',f:'찍꼬 매입',ck:true,ic:'ice',c1:'#4F7FA8'},
+    {id:4,c:'식기세척기',n:'업소용 도어형 식기세척기',y:'2018년식',p:1150000,g:'B',a:'연남동',f:'폐업 매장',ck:true,ic:'drop',c1:'#5A8A7A'},
+    {id:5,c:'화구·레인지',n:'3구 가스 레인지 (오븐형)',y:'2020년식',p:380000,g:'B',a:'상수동',f:'개인 판매',ck:false,ic:'flame',c1:'#A8664F'},
+    {id:6,c:'커피머신',n:'2그룹 에스프레소 머신',y:'2022년식',p:2300000,g:'A',a:'성산동',f:'폐업 매장',ck:true,ic:'thermo',c1:'#6B4F3A'},
+    {id:7,c:'테이블·의자',n:'4인 테이블 세트 ×6',y:'2023년식',p:540000,g:'A',a:'망원동',f:'폐업 매장',ck:false,ic:'box',c1:'#8A7A5A'},
+    {id:8,c:'냉장고',n:'삼성 업소용 냉동고 25박스',y:'2017년식',p:390000,g:'C',a:'도화동',f:'개인 판매',ck:false,ic:'snow',c1:'#6A88A8'}];
+  var UF=['전체','냉장고','제빙기','식기세척기','화구·레인지','커피머신','테이블·의자'],uf='전체';
+  UF.forEach(function(f){var b=document.createElement('button');b.textContent=f;b.setAttribute('aria-pressed',String(f===uf));b.onclick=function(){uf=f;$('uflt').querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});uRender()};$('uflt').appendChild(b)});
+  function uImg(it){return tile(it.ic,it.c1,'#2A2E33')}
+  function uRender(){$('ugrid').innerHTML=UI.filter(function(it){return uf==='전체'||it.c===uf}).map(function(it){return '<button class="uc" data-u="'+it.id+'"><div class="im">'+uImg(it)+'<span class="gr">'+it.g+'급</span></div><div class="bd2"><b>'+it.n+'</b><div class="pr">'+won(it.p)+'원</div><small>'+it.y+' · '+it.a+'</small>'+(it.ck?'<div class="ok">✓ 찍꼬 점검</div>':'')+'</div></button>'}).join('')}
+  uRender();
+  $('ugrid').addEventListener('click',function(e){var b=e.target.closest('[data-u]');if(!b)return;uDetail(+b.dataset.u)});
+  var curItem=null;
+  function uDetail(id){var it=UI.filter(function(x){return x.id===id})[0];curItem=it;
+    $('uitem').innerHTML='<div class="uhero" style="background:linear-gradient(135deg,'+it.c1+',#2A2E33)">'+uImg(it).replace('<svg viewBox','<svg style="width:100%;height:100%;border-radius:22px" viewBox')+'</div>'+
+      '<h2 style="margin-top:0">'+it.n+'</h2><div style="color:var(--muted);font-size:14px">'+it.y+' · '+it.a+' · '+it.f+'</div>'+
+      '<div class="price" style="font-family:Outfit,sans-serif;font-weight:800;font-size:30px;margin:8px 0 4px">'+won(it.p)+'<span style="font-size:16px;font-family:IBM Plex Sans KR">원</span></div>'+
+      (it.ck?'<div class="card"><div class="lab">찍꼬 기사님 점검 리포트</div><div class="mrow"><span>작동 테스트</span><b style="color:var(--ok)">정상</b></div><div class="mrow"><span>소음·진동</span><b style="color:var(--ok)">정상</b></div><div class="mrow"><span>외관</span><b>'+it.g+'급'+(it.g!=='A'?' (모서리 찍힘)':'')+'</b></div><div class="mrow"><span>소모품</span><b>패킹 교체 완료</b></div><div class="mrow"><span>보증</span><b>구매 후 3개월</b></div></div>'
+        :'<div class="card"><div class="lab">점검 전 장비</div><span style="font-size:14.5px">판매자가 직접 올린 장비예요. 3만 원에 찍꼬 기사님 점검을 먼저 받아볼 수 있어요.</span></div>')+
+      '<button class="linkcard" id="uMove"><svg class="i"><use href="#i-box"/></svg><span><b>운반·설치까지 같이 신청하기</b><br>구매한 장비를 매장까지 옮기고 설치해드려요.</span></button>';
+    $('uMove').onclick=function(){mPrefill(it);go('m-form')};
+    go('u-item');}
+  BAR['u-item']=['구매하기',function(){return true}];
+  segInit('utab',function(b){var buy=b.dataset.t==='buy';$('ubuy').hidden=!buy;$('usell').hidden=buy;if(!buy)uSellRender()});
+  var sellShot=false,sellMode='self';
+  function uSellRender(){
+    $('uph').innerHTML=sellShot?'<div class="ph" style="width:110px;height:110px">'+tile('fridge','#7C8794','#2A2E33')+'</div>':'<label class="add" style="width:110px;height:110px"><input type="file" accept="image/*" capture="environment" id="uin">'+ico('cam')+'</label><button id="usamp" style="align-self:center;font-size:13.5px;color:var(--orange);font-weight:600;text-decoration:underline">샘플 사진 넣기</button>';
+    var go1=function(){sellShot=true;uSellRender()};
+    if($('uin'))$('uin').onchange=go1;if($('usamp'))$('usamp').onclick=go1;
+    $('uquote').innerHTML=!sellShot?'':'<div class="readout" style="margin-top:12px"><div class="readhead">'+ck+'AI 시세를 확인했어요</div><div class="kv"><span>장비</span><b>LG 업소용 냉장고 45박스</b><span>연식</span><b>2021년식 (라벨 기준)</b><span>예상 판매가</span><b>80만~110만 원</b></div></div>'+
+      '<div class="seg2" id="smode" style="margin-top:12px"><button aria-pressed="'+(sellMode==='self')+'" data-v="self">직접 판매</button><button aria-pressed="'+(sellMode==='buy')+'" data-v="buy">찍꼬 매입</button></div>'+
+      '<div class="card" style="margin-top:0">'+(sellMode==='self'?'<div class="mrow"><span>예상 판매가</span><b>80만~110만 원</b></div><div class="mrow"><span>판매 수수료</span><b>5%</b></div><div class="mrow"><span>걸리는 시간</span><b>보통 1~3주</b></div><div class="mrow"><span>찍꼬 점검 배지</span><b>3만 원 (선택)</b></div>'
+        :'<div class="mrow"><span>찍꼬 매입가</span><b style="color:var(--orange)">55만~70만 원</b></div><div class="mrow"><span>입금</span><b>수거 당일</b></div><div class="mrow"><span>수거 비용</span><b>무료</b></div><div class="mrow"><span>최종 금액</span><b>기사님 현장 확인 후</b></div>')+'</div>';
+    if($('smode'))segInit('smode',function(b){sellMode=b.dataset.v;uSellRender()});
+    updateBar();
+  }
+  $('toClose').onclick=function(){qSet('demo');qext.add('주방 장비 중고 매입 같이');go('q-form');$('qext').querySelectorAll('button').forEach(function(b){if(b.textContent==='주방 장비 중고 매입 같이')b.setAttribute('aria-pressed','true')})};
+
+  // ---- MOVE ----
+  var MI=[['fridge','업소용 냉장고',3],['freezer','업소용 냉동고',3],['ice','제빙기',2],['dish','식기세척기',2],['range','화구·레인지',2],['table','테이블·의자 세트',1],['etc','기타 소형 장비',1]];
+  var mq={};MI.forEach(function(m){mq[m[0]]=0});
+  function mRenderItems(){$('mitems').innerHTML=MI.map(function(m){return '<div class="mrow"><span>'+m[1]+'</span><span class="stepper"><button data-m="'+m[0]+'" data-d="-1" aria-label="'+m[1]+' 빼기">−</button><span>'+mq[m[0]]+'</span><button data-m="'+m[0]+'" data-d="1" aria-label="'+m[1]+' 더하기">+</button></span></div>'}).join('');mEst()}
+  $('mitems').addEventListener('click',function(e){var b=e.target.closest('[data-m]');if(!b)return;mq[b.dataset.m]=Math.max(0,Math.min(20,mq[b.dataset.m]+(+b.dataset.d)));mRenderItems()});
+  ['mfromF','mtoF','mdate'].forEach(function(id){segInit(id,mEst)});
+  ['minst','mdisp'].forEach(function(id){$(id).onclick=function(){this.setAttribute('aria-pressed',String(this.getAttribute('aria-pressed')!=='true'));mEst()}});
+  function mCalc(){var w=0,n=0,heavy=0;MI.forEach(function(m){w+=m[2]*mq[m[0]];n+=mq[m[0]];if(m[2]>=2)heavy+=mq[m[0]]});
+    var veh=w<=6?['1톤 트럭 · 기사님 1명',90000]:w<=14?['1톤 트럭 · 기사님 2명',150000]:['2.5톤 트럭 · 기사님 2명',250000];
+    var fl=(+segVal('mfromF')+(+segVal('mtoF')))*30000*Math.max(1,Math.ceil(heavy/2));
+    var inst=$('minst').getAttribute('aria-pressed')==='true'?heavy*30000:0,disp=$('mdisp').getAttribute('aria-pressed')==='true'?40000:0;
+    var tot=veh[1]+n*10000+fl+inst+disp;return {n:n,veh:veh,fl:fl,inst:inst,disp:disp,tot:tot}}
+  function mEst(){var c=mCalc();
+    $('mest').innerHTML=c.n===0?'<div class="lab">예상 비용</div><span style="color:var(--on-brand-muted)">옮길 장비를 골라주세요</span>':
+      '<div class="lab">예상 비용 · '+c.veh[0]+'</div><div class="price">'+won(c.tot)+'<span>원</span> ~ '+won(Math.round(c.tot*1.15/1000)*1000)+'<span>원</span></div><small>기본 '+won(c.veh[1])+'원 + 장비 '+c.n+'대'+(c.fl?' + 계단 '+won(c.fl)+'원':'')+(c.inst?' + 설치 '+won(c.inst)+'원':'')+(c.disp?' + 수거·폐기 4만 원':'')+'<br>운반 중 파손은 화물 배상보험으로 보상돼요.</small>';
+    updateBar()}
+  function mPrefill(it){MI.forEach(function(m){mq[m[0]]=0});
+    if(it){var map={'냉장고':'fridge','제빙기':'ice','식기세척기':'dish','화구·레인지':'range','테이블·의자':'table','커피머신':'etc'};mq[map[it.c]||'etc']=1;$('mfrom').value='서울 마포구 '+it.a+' (판매자 매장)';$('minst').setAttribute('aria-pressed','true')}
+    mRenderItems()}
+  mRenderItems();
+  BAR['m-form']=['운반 기사님 부르기',function(){return mCalc().n>0}];
+
+  // ---- generic ok + actions ----
+  function xOk(t,lead,html){$('xok').innerHTML='<div class="okbig"><svg class="i"><use href="#i-check"/></svg></div><div class="center"><h2>'+t+'</h2><p class="lead">'+lead+'</p></div>'+(html||'');go('x-ok')}
+  BAR['x-ok']=['홈으로',function(){return true}];NEXT['x-ok']='home';
+  BAR['u-home']=null;
+  var XACT={
+    'u-item':function(){var it=curItem;xOk('구매 신청이 됐어요','판매자가 확인하면 알려드려요. 결제 금액은 찍꼬가 보관하다가 장비를 받고 확인하면 판매자에게 전달돼요.','<div class="card"><div class="mrow"><span>장비</span><b>'+it.n+'</b></div><div class="mrow"><span>금액</span><b>'+won(it.p)+'원</b></div><div class="mrow"><span>보증</span><b>'+(it.ck?'3개월':'점검 후 결정')+'</b></div></div>')},
+    'u-home':function(){xOk(sellMode==='buy'?'매입 신청이 됐어요':'판매 등록이 됐어요',sellMode==='buy'?'찍꼬 기사님이 방문해서 상태를 확인하고, 수거 당일 입금해드려요.':'중고 장터에 올라갔어요. 구매 문의가 오면 알려드려요.')},
+    'm-form':function(){var c=mCalc();xOk('운반 기사님이 배정됐어요','최강운 기사님이 '+segVal('mdate')+' 출발 전에 연락드릴 거예요.','<div class="card"><div class="mrow"><span>차량</span><b>'+c.veh[0]+'</b></div><div class="mrow"><span>장비</span><b>'+c.n+'대'+(c.inst?' · 설치 포함':'')+'</b></div><div class="mrow"><span>예상 비용</span><b>'+won(c.tot)+'원~</b></div><div class="mrow"><span>기사님</span><b>최강운 · ★4.9 · 운반 412건</b></div></div><div class="card"><div class="lab">안심 운반</div><span style="font-size:14.5px">운반 중 파손은 화물 배상보험으로 보상돼요. 설치까지 신청하셨으면 작동 확인 후 완료 처리해요.</span></div>')}
+  };
+  // sell bar when on sell tab
+  var _ub=updateBar;updateBar=function(busy){_ub(busy);if(cur==='u-home'){var sell=!$('usell').hidden;$('bar').style.display=sell?'':'none';if(sell){$('cta').textContent=sellMode==='buy'?'찍꼬 매입 신청':'중고 장터에 올리기';$('cta').disabled=!sellShot}}};
+  var _go5=go;go=function(id){
+    _go5(id);
+    if(id==='q-list')qRenderList();
+    if(id==='q-wait')$('qwaitLead').textContent='근처 '+QT[qk].n+' 업체 5곳에 사진과 내용을 보냈어요.';
+    if(XHEAD[id]){$('stepHead').hidden=false;$('progress').hidden=true;$('stepTitle').textContent=XHEAD[id][0];$('stepCount').textContent='';updateBar()}
+  };
+  // 간판 수리에서 견적 안내
+  var _sc=setCat;setCat=function(k){_sc(k);var old=$('signLink');if(old)old.remove();if(k==='sign'){$('chips').insertAdjacentHTML('beforebegin','<button class="linkcard" id="signLink" style="margin:0 0 12px"><svg class="i"><use href="#i-doc"/></svg><span><b>간판 새로 만들기·천갈이는 여기서</b><br>여러 업체 견적을 비교해보세요.</span></button>');$('signLink').onclick=function(){qSet('sign');go('q-form')}}};
+  $('startBtn').onclick=function(){go('cat')};
+  $('backBtn').onclick=function(){if(HEAD[cur]){if(cur==='local')state.pref=null;go(cur==='cat'&&state.pref?'pro':HEAD[cur][1]);return}var b={'1':'cat','2':'1','3':'2','4':'3',sum:'4'};if(b[cur])go(b[cur])};
+
+  BAR.review=['평가 남기기',function(){return state.stars>0}];
+  BAR.thanks=['처음부터 다시 체험하기',function(){return true}];
+  NEXT.review='thanks';
+  var _go=go;go=function(id){_go(id);if(id==='thanks')renderThanks()};
+  $('cta').onclick=function(){if(cur==='thanks'){location.reload();return}var n=NEXT[cur];if(n)go(n)};
+
+  var _cta2=$('cta').onclick;$('cta').onclick=function(){if(XACT[cur]){XACT[cur]();return}_cta2()};
+  var _bb2=$('backBtn').onclick;$('backBtn').onclick=function(){if(XHEAD[cur]){go(XHEAD[cur][1]);return}_bb2()};
+  go('home');
+})();
+</script>
+</body>
+</html>
