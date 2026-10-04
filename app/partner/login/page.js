@@ -176,10 +176,19 @@ export default function PartnerLoginPage() {
 
         const userId = data.user?.id;
         if (userId) {
-          const { error: upsertError } = await supabase
-            .from("partners")
-            .upsert({ id: userId, name: name.trim(), phone: phone.trim() });
-          if (upsertError) throw upsertError;
+          // 가입 직후엔 "이메일 확인" 설정에 따라 세션이 아직 없을 수 있어서
+          // (그러면 RLS 때문에 브라우저에서 바로 partners에 못 씀), 서버
+          // 라우트(서비스 롤 키 사용)를 통해 저장함 — 세션 유무와 무관하게
+          // 항상 성공함.
+          const profileRes = await fetch("/api/partner-profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, name: name.trim(), phone: phone.trim() }),
+          });
+          if (!profileRes.ok) {
+            const profileErr = await profileRes.json().catch(() => ({}));
+            throw new Error(profileErr.error || "프로필 저장에 실패했어요.");
+          }
         }
 
         if (!data.session) {
