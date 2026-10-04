@@ -292,8 +292,8 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
 .rvi{background:var(--surface);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);font-size:14.5px}
 .rvi .h{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:4px}
 .rvi .h b{color:var(--orange);font-weight:600;letter-spacing:1px}
-.rvi .tg{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.rvi .tg span{background:var(--orange-soft);color:var(--orange);border-radius:8px;padding:2px 8px;font-size:12.5px;font-weight:600}
+.rvi .rvtags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.rvi .rvtags span{background:var(--orange-soft);color:var(--orange);border-radius:8px;padding:2px 8px;font-size:12.5px;font-weight:600}
 
 /* ===== CALL BOARD ===== */
 .boardbtn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 22px rgba(255,107,0,.3);margin-bottom:10px}
@@ -999,7 +999,7 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
     var max=Math.max.apply(null,Object.keys(TAGS).map(function(k){return TAGS[k]}));
     $('tagBars').innerHTML=Object.keys(TAGS).sort(function(a,b){return TAGS[b]-TAGS[a]}).map(function(k){return '<div class="tbar"><span>'+k+'</span><i><b style="width:'+(TAGS[k]/max*100)+'%"></b></i><span>'+TAGS[k]+'</span></div>'}).join('');
     $('rvCount').textContent='리뷰 '+count+'개';
-    $('rvList').innerHTML=REVIEWS.map(function(r){return '<div class="rvi"><div class="h"><span>'+r.who+(r.isNew?'<span class="new-tag">NEW</span>':'')+'</span><span><b>'+'★'.repeat(r.st)+'</b> · '+r.when+'</span></div>“'+r.txt+'”<div class="tg">'+r.tags.map(function(t){return '<span>'+t+'</span>'}).join('')+'</div></div>'}).join('');
+    $('rvList').innerHTML=REVIEWS.map(function(r){return '<div class="rvi"><div class="h"><span>'+r.who+(r.isNew?'<span class="new-tag">NEW</span>':'')+'</span><span><b>'+'★'.repeat(r.st)+'</b> · '+r.when+'</span></div>“'+r.txt+'”<div class="rvtags">'+r.tags.map(function(t){return '<span>'+t+'</span>'}).join('')+'</div></div>'}).join('');
   }
   renderReviews();
   var _go=go;go=function(id){
