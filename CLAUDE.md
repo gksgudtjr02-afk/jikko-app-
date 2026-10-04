@@ -26,6 +26,7 @@
 - 루트 `/`는 고객용/기사님용 두 앱으로 가는 진입 페이지(`app/page.js`)
 - **기사님(파트너) 로그인 — 실제로 동작함 (2026-10 추가)**: 고운(GOUN)과 같은 패턴(`@supabase/ssr`, `lib/supabaseClient.js`/`supabaseServer.js`/`supabaseAdmin.js`, `middleware.js`, `app/auth/callback/route.js`)으로 Supabase 인증을 붙임.
   - `app/partner/login/page.js` — 이메일+비밀번호로 실제 가입/로그인하는 폼(React). 가입 시 이름·휴대폰 번호도 같이 받아서 `partners` 테이블에 저장함.
+  - **버그 수정 (2026-10)**: 가입 직후 브라우저(anon key)에서 바로 `partners`에 저장하려다 "new row violates row-level security policy" 에러가 났었음 — Supabase의 "이메일 확인" 설정이 켜진 상태면 가입 직후 세션이 아직 없어서 `auth.uid()`가 비어있고, RLS의 `with check (auth.uid() = id)`를 못 통과했기 때문. `app/api/partner-profile/route.js`(서비스 롤 키 사용, RLS 우회)를 새로 만들어서 그쪽으로 저장을 옮김 — 이제 "이메일 확인" 설정이 켜져 있든 꺼져 있든 항상 정상적으로 저장됨.
   - `middleware.js`가 `/partner.html` 요청을 가로채서, 로그인 안 한 사용자는 `/partner/login`으로 돌려보냄 — 로그인하면 프로토타입(`/partner.html`)으로 바로 들어감.
   - `app/partner/logout/route.js` — 로그아웃 라우트는 만들어뒀지만 **아직 화면 어디에도 버튼으로 연결 안 함** (프로토타입 마크업을 안 건드리기로 해서). 테스트할 땐 주소창에 직접 `/partner/logout` 입력하면 됨.
   - **⚠ 휴대폰 문자(SMS) 인증은 아직 가짜임**: 프로토타입 안에 있던 "인증받기" 버튼은 여전히 가짜 6자리 코드를 자동으로 채워주는 데모 상태 그대로임 — 진짜 SMS 인증은 별도 유료 서비스 연동이 필요해서, 일단 이메일+비밀번호 로그인만 실제로 동작하게 만들고 이름/번호는 프로필에만 저장해둠.
