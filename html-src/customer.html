@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{
   --page:#EEF0F3; --surface:#FFFFFF; --ink:#16181C; --muted:#6B717A; --line:#E1E4E8; --chip:#F5F6F8;
@@ -763,6 +764,33 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
   ];
   var CALLOUT=20000;
   var state={img:{},label:false,code:null,sym:new Set()};
+
+  // ---- 콜보드 연동: 실제 Supabase에 요청을 생성함 (기사님 화면의 콜보드에 뜨게) ----
+  // 키가 아직 설정 안 됐으면(__SUPABASE_URL__ 치환 실패) 조용히 건너뛰고
+  // 기존 데모 흐름만 그대로 진행함 — 이 연동이 실패해도 화면은 절대 안 깨짐.
+  var sb=null;
+  try{
+    var SB_URL='__SUPABASE_URL__',SB_KEY='__SUPABASE_ANON_KEY__';
+    if(window.supabase&&SB_URL.indexOf('__')!==0)sb=window.supabase.createClient(SB_URL,SB_KEY);
+  }catch(e){}
+  async function createJob(){
+    if(!sb)return null;
+    try{
+      var d=diagnose();
+      var row={
+        status:'new',
+        equipment:CAT.equip[0],
+        symptom:d.picked.map(function(s){return s.t}).join(', ')||'잘 모르겠어요',
+        error_code:(state.code&&CAT.code)?CAT.code.c:null,
+        memo:$('memo').value.trim()||null,
+        price_low:d.lo,price_high:d.hi,urgent:d.urgent
+      };
+      var res=await sb.from('jobs').insert(row).select().single();
+      if(res.error)throw res.error;
+      state.jobId=res.data.id;
+      return res.data;
+    }catch(e){console.error('[jikko] createJob 실패',e);return null;}
+  }
   var cur='home';
   var $=function(id){return document.getElementById(id)};
   var won=function(n){return n.toLocaleString('ko-KR')};
@@ -1282,7 +1310,12 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
   var XACT={
     'u-item':function(){var it=curItem;xOk('구매 신청이 됐어요','판매자가 확인하면 알려드려요. 결제 금액은 찍꼬가 보관하다가 장비를 받고 확인하면 판매자에게 전달돼요.','<div class="card"><div class="mrow"><span>장비</span><b>'+it.n+'</b></div><div class="mrow"><span>금액</span><b>'+won(it.p)+'원</b></div><div class="mrow"><span>보증</span><b>'+(it.ck?'3개월':'점검 후 결정')+'</b></div></div>')},
     'u-home':function(){xOk(sellMode==='buy'?'매입 신청이 됐어요':'판매 등록이 됐어요',sellMode==='buy'?'찍꼬 기사님이 방문해서 상태를 확인하고, 수거 당일 입금해드려요.':'중고 장터에 올라갔어요. 구매 문의가 오면 알려드려요.')},
-    'm-form':function(){var c=mCalc();xOk('운반 기사님이 배정됐어요','최강운 기사님이 '+segVal('mdate')+' 출발 전에 연락드릴 거예요.','<div class="card"><div class="mrow"><span>차량</span><b>'+c.veh[0]+'</b></div><div class="mrow"><span>장비</span><b>'+c.n+'대'+(c.inst?' · 설치 포함':'')+'</b></div><div class="mrow"><span>예상 비용</span><b>'+won(c.tot)+'원~</b></div><div class="mrow"><span>기사님</span><b>최강운 · ★4.9 · 운반 412건</b></div></div><div class="card"><div class="lab">안심 운반</div><span style="font-size:14.5px">운반 중 파손은 화물 배상보험으로 보상돼요. 설치까지 신청하셨으면 작동 확인 후 완료 처리해요.</span></div>')}
+    'm-form':function(){var c=mCalc();xOk('운반 기사님이 배정됐어요','최강운 기사님이 '+segVal('mdate')+' 출발 전에 연락드릴 거예요.','<div class="card"><div class="mrow"><span>차량</span><b>'+c.veh[0]+'</b></div><div class="mrow"><span>장비</span><b>'+c.n+'대'+(c.inst?' · 설치 포함':'')+'</b></div><div class="mrow"><span>예상 비용</span><b>'+won(c.tot)+'원~</b></div><div class="mrow"><span>기사님</span><b>최강운 · ★4.9 · 운반 412건</b></div></div><div class="card"><div class="lab">안심 운반</div><span style="font-size:14.5px">운반 중 파손은 화물 배상보험으로 보상돼요. 설치까지 신청하셨으면 작동 확인 후 완료 처리해요.</span></div>')},
+    // 수리 요청 확인 화면에서 "기사님 부르기"를 누르면, 데모 매칭
+    // 애니메이션으로 넘어가기 전에 실제 콜보드용 요청을 먼저 만들어둠.
+    // createJob()은 Supabase 연동이 안 돼있어도 조용히 null을 반환할 뿐이라
+    // 이 흐름 자체는 항상 그대로 진행됨.
+    'sum':function(){createJob().then(function(){go('match')})}
   };
   // sell bar when on sell tab
   var _ub=updateBar;updateBar=function(busy){_ub(busy);if(cur==='u-home'){var sell=!$('usell').hidden;$('bar').style.display=sell?'':'none';if(sell){$('cta').textContent=sellMode==='buy'?'찍꼬 매입 신청':'중고 장터에 올리기';$('cta').disabled=!sellShot}}};

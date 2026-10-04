@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{
   --page:#EEF0F3; --surface:#FFFFFF; --ink:#16181C; --muted:#6B717A; --line:#E1E4E8; --chip:#F3F4F6;
@@ -719,8 +720,22 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
   }
   function tick(){$('tnum').textContent=left;$('tfg').style.strokeDashoffset=150.8*(1-left/30)}
   function closeCall(){clearInterval(callTimer);$('call').classList.remove('open');document.body.style.overflow=''}
-  $('decline').onclick=function(){closeCall();toast('거절했어요. 다음 호출을 기다릴게요')};
-  $('accept').onclick=function(){closeCall();go('go');toast('배정 완료! 사장님께 출발 알림을 보냈어요')};
+  $('decline').onclick=function(){grabbing=null;closeCall();toast('거절했어요. 다음 호출을 기다릴게요')};
+  $('accept').onclick=async function(){
+    if(grabbing&&grabbing.real){
+      var ok=await claimJob(grabbing.realJobId);
+      if(!ok){
+        toast('아쉽게도 다른 기사님이 먼저 잡았어요');
+        calls=calls.filter(function(c){return c!==grabbing});
+        grabbing=null;closeCall();renderBoard();
+        return;
+      }
+      grabbing.status='matched';grabbing.me=true;grabbing=null;
+    }else if(grabbing){
+      grabbing.status='matched';grabbing.me=true;grabbing=null;
+    }
+    closeCall();go('go');toast('배정 완료! 사장님께 출발 알림을 보냈어요');
+  };
 
   // dispatch stages
   var goStage=0;
@@ -802,12 +817,76 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
     {eq:'대우 업소용 냉장고',sym:'물이 새요',dong:'도화동',km:3.4,earn:[42500,76500]}];
   var OTH=['박○○','이○○','최○○','정○○','강○○'];
   var calls=[],seq=0,btab='new',boardStarted=false;
+
+  // ---- 콜보드 실연동: Supabase에서 진짜 요청을 읽고, 수락은 원자적 업데이트로 처리함 ----
+  // 키/세션이 아직 설정 안 됐으면(__ 치환 실패) 조용히 건너뛰고 기존 데모
+  // 시뮬레이션만 그대로 동작함 — 이 연동이 실패해도 화면은 절대 안 깨짐.
+  var sb=null,PARTNER_ID='__PARTNER_ID__';
+  try{
+    var SB_URL='__SUPABASE_URL__',SB_KEY='__SUPABASE_ANON_KEY__';
+    var AT='__ACCESS_TOKEN__',RT='__REFRESH_TOKEN__';
+    if(window.supabase&&SB_URL.indexOf('__')!==0){
+      sb=window.supabase.createClient(SB_URL,SB_KEY);
+      if(AT.indexOf('__')!==0)sb.auth.setSession({access_token:AT,refresh_token:RT});
+    }
+  }catch(e){}
+
+  function jobToCall(row){
+    return {
+      id:++seq,real:true,realJobId:row.id,
+      status:row.status==='matched'?'matched':'new',
+      left:300,watch:1,age:0,bonus:false,
+      me:row.technician_id===PARTNER_ID,
+      by:(row.technician_id&&row.technician_id!==PARTNER_ID)?'다른 기사님':undefined,
+      took:'',
+      t:{eq:row.equipment,sym:row.symptom+(row.error_code?' · '+row.error_code:''),dong:'우리 동네',km:0,earn:[row.price_low,row.price_high],u:!!row.urgent}
+    };
+  }
+  async function loadRealJobs(){
+    if(!sb)return;
+    try{
+      var res=await sb.from('jobs').select('*').eq('status','new').order('created_at',{ascending:false});
+      if(res.error)throw res.error;
+      (res.data||[]).forEach(function(row){
+        if(calls.some(function(c){return c.realJobId===row.id}))return;
+        calls.unshift(jobToCall(row));
+      });
+      renderBoard();
+    }catch(e){console.error('[jikko] loadRealJobs 실패',e);}
+  }
+  function watchRealJobs(){
+    if(!sb)return;
+    sb.channel('jobs-board').on('postgres_changes',{event:'INSERT',schema:'public',table:'jobs'},function(payload){
+      if(payload.new.status!=='new')return;
+      if(calls.some(function(c){return c.realJobId===payload.new.id}))return;
+      calls.unshift(jobToCall(payload.new));
+      if(cur==='board'){renderBoard();toast('새 호출이 들어왔어요');try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}
+    }).on('postgres_changes',{event:'UPDATE',schema:'public',table:'jobs'},function(payload){
+      var c=calls.filter(function(c){return c.realJobId===payload.new.id})[0];
+      if(!c)return;
+      if(payload.new.status==='matched'&&c.status==='new'){
+        c.status='matched';c.me=payload.new.technician_id===PARTNER_ID;
+        if(!c.me)c.by='다른 기사님';
+        if(cur==='board'){renderBoard();if(!c.me&&btab==='new')toast(c.t.dong+' 콜을 다른 기사님이 잡았어요')}
+      }
+    }).subscribe();
+  }
+  async function claimJob(jobId){
+    if(!sb)return true; // 연동 전이면 데모처럼 항상 성공 처리
+    try{
+      var res=await sb.from('jobs').update({status:'matched',technician_id:PARTNER_ID,matched_at:new Date().toISOString()}).eq('id',jobId).eq('status','new').select();
+      if(res.error)throw res.error;
+      return !!(res.data&&res.data.length);
+    }catch(e){console.error('[jikko] claimJob 실패',e);return false;}
+  }
+  watchRealJobs();
   function mk(left,status){var t=TPL[seq%TPL.length];seq++;return {id:seq,t:t,left:left,status:status||'new',watch:1+Math.floor(Math.random()*4),age:0,bonus:false}}
   function initBoard(){
     calls=[mk(262),mk(155)];
     var m1=mk(0,'matched');m1.by='박○○';m1.took='1분 12초';var m2=mk(0,'matched');m2.by='이○○';m2.took='38초';
     var d1=mk(0,'done');d1.by='최○○';var d2=mk(0,'done');d2.by='나 (김도윤)';d2.me=true;var d3=mk(0,'done');d3.by='강○○';
     calls=calls.concat([m1,m2,d1,d2,d3]);
+    loadRealJobs();
   }
   var mmss=function(x){return Math.floor(x/60)+':'+String(x%60).padStart(2,'0')};
   var man=function(n){return (n/10000).toFixed(1).replace('.0','')+'만'};
@@ -835,15 +914,13 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
   $('btabs').querySelectorAll('button').forEach(function(b){b.onclick=function(){btab=b.dataset.t;$('btabs').querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});renderBoard()}});
   var grabbing=null;
   $('clist').addEventListener('click',function(e){var g=e.target.closest('[data-grab]');if(!g)return;var x=calls.filter(function(c){return c.id==+g.dataset.grab})[0];if(!x||x.status!=='new'){toast('아쉽게도 다른 기사님이 먼저 잡았어요');return}grabbing=x;openCall()});
-  $('accept').addEventListener('click',function(){if(grabbing){grabbing.status='matched';grabbing.me=true;grabbing=null}});
-  $('decline').addEventListener('click',function(){grabbing=null});
   setInterval(function(){
     if(!boardStarted)return;
     calls.forEach(function(x){
       if(x.status!=='new'||x===grabbing)return;
       x.left--;x.age++;
       if(Math.random()<.25)x.watch=Math.max(1,Math.min(6,x.watch+(Math.random()<.5?-1:1)));
-      if(x.age>25&&Math.random()<0.02){x.status='matched';x.by=OTH[Math.floor(Math.random()*OTH.length)];x.took=mmss(x.age).replace(':','분 ')+'초';if(cur==='board'&&btab==='new')toast(x.t.dong+' 콜을 '+x.by+' 기사님이 잡았어요')}
+      if(!x.real&&x.age>25&&Math.random()<0.02){x.status='matched';x.by=OTH[Math.floor(Math.random()*OTH.length)];x.took=mmss(x.age).replace(':','분 ')+'초';if(cur==='board'&&btab==='new')toast(x.t.dong+' 콜을 '+x.by+' 기사님이 잡았어요')}
       if(x.left<=0){x.left=180;x.bonus=true;x.t=Object.assign({},x.t,{earn:[x.t.earn[0]+5000,x.t.earn[1]+5000]});if(cur==='board')toast('5분 지나서 반경을 넓히고 보너스가 붙었어요')}
     });
     if(Math.random()<0.08&&calls.filter(function(x){return x.status==='new'}).length<4){calls.unshift(mk(300));if(cur==='board'){toast('새 호출이 들어왔어요');try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}}
