@@ -1,11 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 
-// ⚠ 테스트용으로 임시로 꺼둠 (2026-10) — 카카오 로그인을 아직 Supabase에
-// 연동 전이라 로그인 자체가 안 되는데, 가입 없이 화면만 먼저 보고 싶다고
-// 해서 /partner.html 보호를 잠깐 꺼둠. 카카오 연동 끝나면 이 줄을
-// false로 되돌릴 것.
-const SKIP_PARTNER_AUTH_FOR_TESTING = true;
+// 카카오 로그인을 Supabase에 실제로 연동 완료함 (2026-10) — 다시 보호 켬.
+const SKIP_PARTNER_AUTH_FOR_TESTING = false;
 
 export async function middleware(request) {
   let response = NextResponse.next({ request });

@@ -11,9 +11,8 @@ import { createClient } from "@/lib/supabaseServer";
 // 끼워넣음 — 페이지 로드 시 그 토큰으로 브라우저의 Supabase 클라이언트가
 // 같은 로그인 상태를 그대로 이어받아서(supabase.auth.setSession), 이후
 // 콜보드 조회/수락 요청에 auth.uid()가 정상적으로 찍힘.
-// ⚠ 테스트용으로 임시로 꺼둠 (2026-10) — middleware.js와 같은 이유/같은
-// 토글. 카카오 연동 끝나면 false로 되돌릴 것.
-const SKIP_PARTNER_AUTH_FOR_TESTING = true;
+// 카카오 로그인을 Supabase에 실제로 연동 완료함 (2026-10) — 다시 보호 켬.
+const SKIP_PARTNER_AUTH_FOR_TESTING = false;
 
 export async function GET(request) {
   const supabase = await createClient();
