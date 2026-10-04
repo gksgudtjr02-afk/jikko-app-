@@ -75,7 +75,7 @@ export default function Home() {
         JIKK<span style={styles.lens} />
       </span>
       <p style={styles.lead}>
-        가전제품이 고장났을 때, 사진 한 장이면 근처 수리기사님이 출동해요.
+        매장 장비가 고장났을 때, 사진 한 장이면 근처 전문 기사님이 출동해요.
       </p>
       <div style={styles.btnRow}>
         <a href="/customer.html" style={{ ...styles.btn, ...styles.primary }}>
