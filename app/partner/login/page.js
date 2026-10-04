@@ -1,11 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { createClient } from "@/lib/supabaseClient";
-
-// 키가 없어도 빌드가 항상 통과하도록 강제 동적 렌더링 — 자세한 이유는
-// lib/supabaseClient.js의 주석 참고.
-export const dynamic = "force-dynamic";
+import { useEffect, useState } from "react";
 
 const C = {
   page: "#EEF0F3",
@@ -120,36 +115,22 @@ const styles = {
 };
 
 export default function PartnerLoginPage() {
-  const supabase = createClient();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleKakaoLogin() {
-    setError("");
-    setBusy(true);
-    try {
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: "kakao",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          // Supabase가 기본으로 account_email까지 요청하는데, 비즈 앱 전환 전이라
-          // 그 항목 권한이 없어서 카카오가 KOE205로 거부함. 저희는 이메일을 아예
-          // 안 쓰니(이름·번호는 가입 후 별도 입력) 동의항목에 켜둔 두 개만 요청.
-          scopes: "profile_nickname profile_image",
-        },
-      });
-      if (oauthError) throw oauthError;
-      // 성공하면 브라우저가 카카오 로그인 화면으로 바로 이동함 — 여기서
-      // 더 할 일 없음. 카카오 로그인이 아직 Supabase에 연동 안 돼있으면
-      // 에러가 던져져서 catch로 감.
-    } catch (err) {
-      setError(
-        err.message?.includes("Unsupported provider")
-          ? "카카오 로그인이 아직 연동 준비 중이에요."
-          : err.message || "문제가 생겼어요. 다시 시도해주세요."
-      );
-      setBusy(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("authError") === "1") {
+      setError("로그인 중 문제가 생겼어요. 다시 시도해주세요.");
     }
+  }, []);
+
+  function handleKakaoLogin() {
+    setBusy(true);
+    // 서버 라우트(/auth/kakao-start)가 카카오 OpenID Connect 인가 화면으로
+    // 보내줌 — Supabase의 기본 카카오 OAuth(signInWithOAuth)와 달리
+    // account_email을 요청하지 않아 KOE205를 피함.
+    window.location.href = "/auth/kakao-start";
   }
 
   return (
