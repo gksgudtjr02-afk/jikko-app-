@@ -130,7 +130,13 @@ export default function PartnerLoginPage() {
     try {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "kakao",
-        options: { redirectTo: `${window.location.origin}/auth/callback` },
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          // Supabase가 기본으로 account_email까지 요청하는데, 비즈 앱 전환 전이라
+          // 그 항목 권한이 없어서 카카오가 KOE205로 거부함. 저희는 이메일을 아예
+          // 안 쓰니(이름·번호는 가입 후 별도 입력) 동의항목에 켜둔 두 개만 요청.
+          scopes: "profile_nickname profile_image",
+        },
       });
       if (oauthError) throw oauthError;
       // 성공하면 브라우저가 카카오 로그인 화면으로 바로 이동함 — 여기서
