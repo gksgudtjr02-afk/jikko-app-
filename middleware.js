@@ -1,8 +1,18 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 
+// ⚠ 테스트용으로 임시로 꺼둠 (2026-10) — 카카오 로그인을 아직 Supabase에
+// 연동 전이라 로그인 자체가 안 되는데, 가입 없이 화면만 먼저 보고 싶다고
+// 해서 /partner.html 보호를 잠깐 꺼둠. 카카오 연동 끝나면 이 줄을
+// false로 되돌릴 것.
+const SKIP_PARTNER_AUTH_FOR_TESTING = true;
+
 export async function middleware(request) {
   let response = NextResponse.next({ request });
+
+  if (SKIP_PARTNER_AUTH_FOR_TESTING) {
+    return response;
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -32,9 +42,20 @@ export async function middleware(request) {
 
   // 기사님(파트너) 화면은 로그인 필요 — 가입/로그인 페이지 자체는 예외.
   const { pathname } = request.nextUrl;
-  if (pathname === "/partner.html" && !user) {
-    const loginUrl = new URL("/partner/login", request.url);
-    return NextResponse.redirect(loginUrl);
+  if (pathname === "/partner.html") {
+    if (!user) {
+      return NextResponse.redirect(new URL("/partner/login", request.url));
+    }
+    // 카카오 첫 로그인은 이름/번호가 없어서 partners에 프로필이 아직
+    // 없을 수 있음 — 그러면 간단한 입력 화면으로 먼저 보냄.
+    const { data: profile } = await supabase
+      .from("partners")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (!profile) {
+      return NextResponse.redirect(new URL("/partner/profile-setup", request.url));
+    }
   }
 
   return response;

@@ -11,13 +11,17 @@ import { createClient } from "@/lib/supabaseServer";
 // 끼워넣음 — 페이지 로드 시 그 토큰으로 브라우저의 Supabase 클라이언트가
 // 같은 로그인 상태를 그대로 이어받아서(supabase.auth.setSession), 이후
 // 콜보드 조회/수락 요청에 auth.uid()가 정상적으로 찍힘.
+// ⚠ 테스트용으로 임시로 꺼둠 (2026-10) — middleware.js와 같은 이유/같은
+// 토글. 카카오 연동 끝나면 false로 되돌릴 것.
+const SKIP_PARTNER_AUTH_FOR_TESTING = true;
+
 export async function GET(request) {
   const supabase = await createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (!session) {
+  if (!session && !SKIP_PARTNER_AUTH_FOR_TESTING) {
     return NextResponse.redirect(new URL("/partner/login", request.url));
   }
 
@@ -27,9 +31,9 @@ export async function GET(request) {
   html = html
     .replaceAll("__SUPABASE_URL__", process.env.NEXT_PUBLIC_SUPABASE_URL || "")
     .replaceAll("__SUPABASE_ANON_KEY__", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "")
-    .replaceAll("__ACCESS_TOKEN__", session.access_token || "")
-    .replaceAll("__REFRESH_TOKEN__", session.refresh_token || "")
-    .replaceAll("__PARTNER_ID__", session.user?.id || "");
+    .replaceAll("__ACCESS_TOKEN__", session?.access_token || "")
+    .replaceAll("__REFRESH_TOKEN__", session?.refresh_token || "")
+    .replaceAll("__PARTNER_ID__", session?.user?.id || "");
 
   return new Response(html, {
     headers: { "content-type": "text/html; charset=utf-8" },

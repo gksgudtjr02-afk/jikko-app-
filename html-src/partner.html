@@ -827,7 +827,7 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
     var AT='__ACCESS_TOKEN__',RT='__REFRESH_TOKEN__';
     if(window.supabase&&SB_URL.indexOf('__')!==0){
       sb=window.supabase.createClient(SB_URL,SB_KEY);
-      if(AT.indexOf('__')!==0)sb.auth.setSession({access_token:AT,refresh_token:RT});
+      if(AT&&AT.indexOf('__')!==0)sb.auth.setSession({access_token:AT,refresh_token:RT});
     }
   }catch(e){}
 
