@@ -39,9 +39,9 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
   },
-  app: { width: "100%", maxWidth: "460px", padding: "0 24px", paddingBottom: "40px" },
+  app: { width: "100%", maxWidth: "460px", padding: "0 32px", paddingBottom: "40px" },
   hero: {
-    margin: "0 -24px 28px",
+    margin: "0 -32px 28px",
     background: `linear-gradient(180deg,${C.brand2},${C.brand})`,
     color: C.onBrand,
     padding: "34px 24px 30px",
