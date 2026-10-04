@@ -41,4 +41,4 @@
 ## 배포
 
 - **GitHub**: `gksgudtjr02-afk/jikko-app-` (저장소 이름 끝에 하이픈이 붙어있음 — 사용자가 GitHub 저장소 생성 화면에서 실수로 들어간 것으로 추정, 기능상 문제 없어서 그대로 둠)
-- **Vercel**: 아직 연결 안 함 — 사용자가 직접 Vercel에서 이 저장소로 새 프로젝트를 만들어야 함
+- **Vercel**: 연결 완료 (2026-10-04). 배포 주소: **https://jikko-app-f6vx.vercel.app** — `main` 브랜치 푸시마다 자동 배포됨. 고객용 화면(`/customer.html`) 실기기 확인 완료.
