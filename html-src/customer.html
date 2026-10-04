@@ -506,7 +506,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
           <button class="svc" data-svc="u-home"><span class="ic"><svg class="i"><use href="#i-fridge"/></svg></span><b>중고 장터</b><small>점검 완료 장비<br>사고·팔기</small></button>
           <button class="svc" data-svc="m-form"><span class="ic"><svg class="i"><use href="#i-box"/></svg></span><b>운반·설치</b><small>장비 옮기기<br>설치까지</small></button>
         </div>
-        <button class="localbtn" id="toLocal"><span class="avstack" id="avStack"></span><span><b>우리 동네 기사님 보기</b><small id="localSub">마포구 · 평가 좋은 기사님을 미리 봐두세요</small></span><svg class="i arr"><use href="#i-next"/></svg></button>
+        <button class="localbtn" id="toLocal"><span class="avstack" id="avStack"></span><span><b>우리 동네 기사님 보기</b><small id="localSub">부평구 · 평가 좋은 기사님을 미리 봐두세요</small></span><svg class="i arr"><use href="#i-next"/></svg></button>
         <h3>찍꼬로 부르면 달라지는 점</h3>
         <div class="why">
           <div><span class="ic"><svg class="i"><use href="#i-box"/></svg></span><span><b>한 번 방문으로 끝나요</b><small>기사님이 모델명과 에러코드를 미리 보고 맞는 부품을 챙겨 와요.</small></span></div>
@@ -629,7 +629,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
     <!-- LOCAL LIST -->
     <section class="screen" id="s-local">
       <div class="areabar"><b id="areaTitle">내 매장 근처</b>
-        <label class="sr" for="areaSel">지역</label><select id="areaSel"><option>마포구</option><option>서대문구</option><option>용산구</option></select></div>
+        <label class="sr" for="areaSel">지역</label><select id="areaSel"><option>부평구</option><option>계양구</option><option>서구</option></select></div>
       <div class="seg2" id="lview" hidden><button aria-pressed="false" data-v="list">목록</button><button aria-pressed="true" data-v="map">지도</button></div>
       <div class="flt" id="flt"></div>
       <div id="mapWrap">
@@ -697,8 +697,8 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
       <h2>무엇을 옮기세요?</h2>
       <p class="lead">장비 종류와 개수에 맞춰 차량과 인원을 정해드려요.</p>
       <div class="card" id="mitems" style="margin-top:0"></div>
-      <div class="fld" style="margin-top:14px"><label class="ql" for="mfrom">출발지</label><input class="inp2" id="mfrom" value="서울 마포구 망원동 ○○식당"><div class="seg2" id="mfromF" style="margin:8px 0 0"><button aria-pressed="true" data-v="0">1층·엘베</button><button aria-pressed="false" data-v="1">계단 2층</button><button aria-pressed="false" data-v="2">계단 3층+</button></div></div>
-      <div class="fld"><label class="ql" for="mto">도착지</label><input class="inp2" id="mto" value="서울 마포구 합정동 새 매장"><div class="seg2" id="mtoF" style="margin:8px 0 0"><button aria-pressed="true" data-v="0">1층·엘베</button><button aria-pressed="false" data-v="1">계단 2층</button><button aria-pressed="false" data-v="2">계단 3층+</button></div></div>
+      <div class="fld" style="margin-top:14px"><label class="ql" for="mfrom">출발지</label><input class="inp2" id="mfrom" value="인천 부평구 부평동 ○○식당"><div class="seg2" id="mfromF" style="margin:8px 0 0"><button aria-pressed="true" data-v="0">1층·엘베</button><button aria-pressed="false" data-v="1">계단 2층</button><button aria-pressed="false" data-v="2">계단 3층+</button></div></div>
+      <div class="fld"><label class="ql" for="mto">도착지</label><input class="inp2" id="mto" value="인천 부평구 산곡동 새 매장"><div class="seg2" id="mtoF" style="margin:8px 0 0"><button aria-pressed="true" data-v="0">1층·엘베</button><button aria-pressed="false" data-v="1">계단 2층</button><button aria-pressed="false" data-v="2">계단 3층+</button></div></div>
       <div class="fld"><span class="ql">날짜</span><div class="seg2" id="mdate"><button aria-pressed="false">오늘</button><button aria-pressed="true">내일</button><button aria-pressed="false">이번 주말</button><button aria-pressed="false">날짜 선택</button></div></div>
       <div class="card" style="margin-top:0">
         <div class="tgl"><span><b>도착해서 설치까지</b><small>수평 맞추기, 전원·배수 연결 (장비당 3만 원)</small></span><button class="sw2" id="minst" aria-pressed="false" aria-label="설치 포함"></button></div>
@@ -852,7 +852,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
     $('carry').innerHTML=ico('box')+(d.parts.length?d.parts.join(', ')+' 챙겨서 출발했어요':'점검 장비 챙겨서 출발했어요');
     $('ticket').innerHTML=
       '<div class="hd"><span>'+(d.urgent?'⚡ 긴급 출동 요청':'새 작업 요청')+'</span><small>1.8km · 14분</small></div><div class="bd">'+
-      '<div class="r"><span>위치</span><b>서울 마포구 ○○식당 주방</b></div>'+
+      '<div class="r"><span>위치</span><b>인천 부평구 ○○식당 주방</b></div>'+
       '<div class="r"><span>장비</span><b>'+CAT.equip[0]+'</b></div>'+
       '<div class="r"><span>에러코드</span><b class="o">'+(state.code&&CAT.code?CAT.code.c+' · '+CAT.code.m:'없음')+'</b></div>'+
       '<div class="r"><span>증상</span><b>'+d.picked.map(function(s){return s.t}).join(', ')+'</b></div>'+
@@ -949,7 +949,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
   var FLT=['전체','냉장·냉동','환풍기·덕트','화장실','하수구','누수','보일러','간판','전기','셔터·도어락','에어컨','제빙기','식기세척기','쇼케이스','커피머신'];
   var fsel='전체';state.fav=new Set(['kim']);state.pref=null;
   $('avStack').innerHTML=PROS.slice(0,4).map(function(p){return '<span>'+p.av+'</span>'}).join('');
-  $('localSub').textContent='마포구 기사님 '+PROS.length+'명 · 평가 미리 보기';
+  $('localSub').textContent='부평구 기사님 '+PROS.length+'명 · 평가 미리 보기';
   FLT.forEach(function(f){var b=document.createElement('button');b.textContent=f;b.setAttribute('aria-pressed',String(f===fsel));b.onclick=function(){fsel=f;$('flt').querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});renderList()};$('flt').appendChild(b)});
   function badgeHTML(p){return '<div class="bdg">'+(state.fav.has(p.id)?'<span class="f">내 단골</span>':'')+p.badges.map(function(b){return '<span class="'+b[0]+'">'+b[1]+'</span>'}).join('')+'</div>'}
   function heart(p){return '<button class="heart" data-fav="'+p.id+'" aria-pressed="'+state.fav.has(p.id)+'" aria-label="단골 등록"><svg class="i"><use href="#i-heart"/></svg></button>'}
@@ -986,7 +986,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
     '<g fill="#D6EBD3"><rect x="235" y="70" width="90" height="70" rx="10"/><rect x="40" y="200" width="70" height="60" rx="10"/></g>'+
     '<g stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"><line x1="0" y1="160" x2="400" y2="190"/><line x1="140" y1="0" x2="170" y2="420"/><line x1="290" y1="0" x2="260" y2="290"/></g>'+
     '<g stroke="#FFFFFF" stroke-width="6"><line x1="0" y1="90" x2="400" y2="100"/><line x1="0" y1="250" x2="400" y2="240"/><line x1="60" y1="0" x2="80" y2="300"/><line x1="350" y1="0" x2="340" y2="290"/><line x1="210" y1="0" x2="215" y2="300"/></g>'+
-    '<g font-size="11" fill="#7A8088" font-family="sans-serif"><text x="20" y="80">망원동</text><text x="300" y="60">서교동</text><text x="20" y="235">성산동</text><text x="230" y="230">합정동</text><text x="150" y="330">한강공원</text></g></svg>';
+    '<g font-size="11" fill="#7A8088" font-family="sans-serif"><text x="20" y="80">부평동</text><text x="300" y="60">청천동</text><text x="20" y="235">부개동</text><text x="230" y="230">산곡동</text><text x="150" y="330">부평공원</text></g></svg>';
   function renderMap(){
     if($('mapWrap').hidden)return;
     var list=PROS.filter(function(p){return fsel==='전체'||p.eq.indexOf(fsel)>=0});
@@ -1240,14 +1240,14 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
 
   // ---- USED ----
   var UI=[
-    {id:1,c:'냉장고',n:'LG 업소용 냉장고 45박스',y:'2021년식',p:850000,g:'A',a:'망원동',f:'폐업 매장',ck:true,ic:'fridge',c1:'#7C8794'},
-    {id:2,c:'냉장고',n:'우성 반찬 냉장고 1500',y:'2019년식',p:420000,g:'B',a:'서교동',f:'찍꼬 매입',ck:true,ic:'fridge',c1:'#8A939E'},
-    {id:3,c:'제빙기',n:'호시자키 제빙기 50kg',y:'2020년식',p:980000,g:'A',a:'합정동',f:'찍꼬 매입',ck:true,ic:'ice',c1:'#4F7FA8'},
-    {id:4,c:'식기세척기',n:'업소용 도어형 식기세척기',y:'2018년식',p:1150000,g:'B',a:'연남동',f:'폐업 매장',ck:true,ic:'drop',c1:'#5A8A7A'},
-    {id:5,c:'화구·레인지',n:'3구 가스 레인지 (오븐형)',y:'2020년식',p:380000,g:'B',a:'상수동',f:'개인 판매',ck:false,ic:'flame',c1:'#A8664F'},
-    {id:6,c:'커피머신',n:'2그룹 에스프레소 머신',y:'2022년식',p:2300000,g:'A',a:'성산동',f:'폐업 매장',ck:true,ic:'thermo',c1:'#6B4F3A'},
-    {id:7,c:'테이블·의자',n:'4인 테이블 세트 ×6',y:'2023년식',p:540000,g:'A',a:'망원동',f:'폐업 매장',ck:false,ic:'box',c1:'#8A7A5A'},
-    {id:8,c:'냉장고',n:'삼성 업소용 냉동고 25박스',y:'2017년식',p:390000,g:'C',a:'도화동',f:'개인 판매',ck:false,ic:'snow',c1:'#6A88A8'}];
+    {id:1,c:'냉장고',n:'LG 업소용 냉장고 45박스',y:'2021년식',p:850000,g:'A',a:'부평동',f:'폐업 매장',ck:true,ic:'fridge',c1:'#7C8794'},
+    {id:2,c:'냉장고',n:'우성 반찬 냉장고 1500',y:'2019년식',p:420000,g:'B',a:'청천동',f:'찍꼬 매입',ck:true,ic:'fridge',c1:'#8A939E'},
+    {id:3,c:'제빙기',n:'호시자키 제빙기 50kg',y:'2020년식',p:980000,g:'A',a:'산곡동',f:'찍꼬 매입',ck:true,ic:'ice',c1:'#4F7FA8'},
+    {id:4,c:'식기세척기',n:'업소용 도어형 식기세척기',y:'2018년식',p:1150000,g:'B',a:'갈산동',f:'폐업 매장',ck:true,ic:'drop',c1:'#5A8A7A'},
+    {id:5,c:'화구·레인지',n:'3구 가스 레인지 (오븐형)',y:'2020년식',p:380000,g:'B',a:'삼산동',f:'개인 판매',ck:false,ic:'flame',c1:'#A8664F'},
+    {id:6,c:'커피머신',n:'2그룹 에스프레소 머신',y:'2022년식',p:2300000,g:'A',a:'부개동',f:'폐업 매장',ck:true,ic:'thermo',c1:'#6B4F3A'},
+    {id:7,c:'테이블·의자',n:'4인 테이블 세트 ×6',y:'2023년식',p:540000,g:'A',a:'부평동',f:'폐업 매장',ck:false,ic:'box',c1:'#8A7A5A'},
+    {id:8,c:'냉장고',n:'삼성 업소용 냉동고 25박스',y:'2017년식',p:390000,g:'C',a:'일신동',f:'개인 판매',ck:false,ic:'snow',c1:'#6A88A8'}];
   var UF=['전체','냉장고','제빙기','식기세척기','화구·레인지','커피머신','테이블·의자'],uf='전체';
   UF.forEach(function(f){var b=document.createElement('button');b.textContent=f;b.setAttribute('aria-pressed',String(f===uf));b.onclick=function(){uf=f;$('uflt').querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});uRender()};$('uflt').appendChild(b)});
   function uImg(it){return tile(it.ic,it.c1,'#2A2E33')}
@@ -1297,7 +1297,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
       '<div class="lab">예상 비용 · '+c.veh[0]+'</div><div class="price">'+won(c.tot)+'<span>원</span> ~ '+won(Math.round(c.tot*1.15/1000)*1000)+'<span>원</span></div><small>기본 '+won(c.veh[1])+'원 + 장비 '+c.n+'대'+(c.fl?' + 계단 '+won(c.fl)+'원':'')+(c.inst?' + 설치 '+won(c.inst)+'원':'')+(c.disp?' + 수거·폐기 4만 원':'')+'<br>운반 중 파손은 화물 배상보험으로 보상돼요.</small>';
     updateBar()}
   function mPrefill(it){MI.forEach(function(m){mq[m[0]]=0});
-    if(it){var map={'냉장고':'fridge','제빙기':'ice','식기세척기':'dish','화구·레인지':'range','테이블·의자':'table','커피머신':'etc'};mq[map[it.c]||'etc']=1;$('mfrom').value='서울 마포구 '+it.a+' (판매자 매장)';$('minst').setAttribute('aria-pressed','true')}
+    if(it){var map={'냉장고':'fridge','제빙기':'ice','식기세척기':'dish','화구·레인지':'range','테이블·의자':'table','커피머신':'etc'};mq[map[it.c]||'etc']=1;$('mfrom').value='인천 부평구 '+it.a+' (판매자 매장)';$('minst').setAttribute('aria-pressed','true')}
     mRenderItems()}
   mRenderItems();
   BAR['m-form']=['운반 기사님 부르기',function(){return mCalc().n>0}];
