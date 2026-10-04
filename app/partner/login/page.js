@@ -4,6 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 
+// Supabase 키가 아직 Vercel 환경변수에 없으면 createClient()가 즉시 에러를
+// 던지는데, 이 페이지를 빌드 시점에 미리 렌더링(static prerender)하려다가
+// 그 에러 때문에 빌드 자체가 실패했었음. force-dynamic으로 "미리 만들어두지
+// 말고 실제 요청 올 때(런타임)만 만들어라"로 바꿔서, 키가 없어도 빌드는
+// 항상 통과하게 함 — 로그인 페이지는 어차피 캐싱하면 안 되는 페이지라
+// 이 설정이 기능적으로도 더 맞음.
+export const dynamic = "force-dynamic";
+
 const C = {
   page: "#EEF0F3",
   surface: "#FFFFFF",
