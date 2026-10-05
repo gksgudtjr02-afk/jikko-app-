@@ -571,6 +571,20 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
       <div class="chips" id="chips"></div>
       <label class="sr" for="memo">기사님께 전할 말</label>
       <textarea id="memo" placeholder="기사님께 전할 말 (선택)&#10;예: 어제 저녁부터 그랬어요, 3시 이후 방문 원해요"></textarea>
+
+      <div class="fld" style="margin-top:14px">
+        <label class="ql" for="addrBiz">상호명</label>
+        <input class="inp2" id="addrBiz" placeholder="예: ○○식당" required>
+      </div>
+      <div class="fld">
+        <label class="ql" for="addrDong">동네</label>
+        <input class="inp2" id="addrDong" placeholder="예: 부평동" required>
+      </div>
+      <div class="fld">
+        <label class="ql" for="addrDetail">상세 주소</label>
+        <input class="inp2" id="addrDetail" placeholder="예: 부평로 12, 1층 주방" required>
+      </div>
+      <p class="demo-note" id="addrSavedNote" hidden>저번에 입력한 정보를 불러왔어요. 다르면 고쳐주세요.</p>
     </section>
 
     <!-- SUMMARY -->
@@ -772,21 +786,37 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
     var SB_URL='__SUPABASE_URL__',SB_KEY='__SUPABASE_ANON_KEY__';
     if(window.supabase&&SB_URL.indexOf('__')!==0)sb=window.supabase.createClient(SB_URL,SB_KEY);
   }catch(e){}
+  var STORE_INFO_KEY='jikko_store_info';
+  function loadStoreInfo(){
+    try{return JSON.parse(localStorage.getItem(STORE_INFO_KEY)||'null')}catch(e){return null}
+  }
+  function saveStoreInfo(info){
+    try{localStorage.setItem(STORE_INFO_KEY,JSON.stringify(info))}catch(e){}
+  }
   async function createJob(){
     if(!sb)return null;
     try{
       var d=diagnose();
+      var biz=document.getElementById('addrBiz').value.trim();
+      var dong=document.getElementById('addrDong').value.trim();
+      var detail=document.getElementById('addrDetail').value.trim();
       var row={
         status:'new',
         equipment:CAT.equip[0],
         symptom:d.picked.map(function(s){return s.t}).join(', ')||'잘 모르겠어요',
         error_code:(state.code&&CAT.code)?CAT.code.c:null,
         memo:$('memo').value.trim()||null,
-        price_low:d.lo,price_high:d.hi,urgent:d.urgent
+        price_low:d.lo,price_high:d.hi,urgent:d.urgent,
+        business:biz||null,dong:dong||null
       };
       var res=await sb.from('jobs').insert(row).select().single();
       if(res.error)throw res.error;
       state.jobId=res.data.id;
+      if(detail){
+        var addrRes=await sb.from('job_addresses').insert({job_id:res.data.id,address:'인천 부평구 '+(dong?dong+' ':'')+detail});
+        if(addrRes.error)console.error('[jikko] job_addresses 저장 실패',addrRes.error);
+      }
+      saveStoreInfo({biz:biz,dong:dong,detail:detail});
       return res.data;
     }catch(e){console.error('[jikko] createJob 실패',e);return null;}
   }
@@ -842,8 +872,13 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
 
   function renderSummary(){
     var d=diagnose(),memo=$('memo').value.trim();
+    var biz=document.getElementById('addrBiz').value.trim();
+    var dong=document.getElementById('addrDong').value.trim();
+    var detail=document.getElementById('addrDetail').value.trim();
+    var fullAddr='인천 부평구 '+(dong?dong+' ':'')+detail;
     var th='<div class="thumbs">'+['1','2','3'].map(function(k){return state.img[k]?'<div>'+strip(state.img[k])+'</div>':'<div class="none">건너뜀</div>'}).join('')+'</div>';
     $('sumBody').innerHTML=
+      '<div class="card"><div class="lab">출동 위치</div><div style="font-size:15px;font-weight:600">'+esc(biz||'상호명 미입력')+'</div><div style="color:var(--muted);font-size:14px;margin-top:2px">'+esc(fullAddr)+'</div></div>'+
       '<div class="card"><div class="equip"><div class="ph">'+strip(state.img['1'])+'</div><div><b>'+CAT.equip[0]+'</b><small>'+CAT.equip[1]+(state.code&&CAT.code?' · 에러 '+CAT.code.c:'')+'</small></div></div>'+th+'</div>'+
       '<div class="card"><div class="lab" style="justify-content:space-between"><span>증상</span><span class="badge '+(d.urgent?'urgent':'normal')+'">'+(d.urgent?ico('bolt')+'긴급 · '+CAT.urg:'일반 접수')+'</span></div><div class="tags">'+d.picked.map(function(s){return '<span>'+s.t+'</span>'}).join('')+'</div>'+(memo?'<p style="margin:10px 0 0;color:var(--muted);font-size:14px">“'+esc(memo)+'”</p>':'')+'</div>'+
       '<div class="card"><div class="lab">AI 예상 원인</div><ol class="causes">'+d.causes.map(function(c,i){return '<li><i>'+(i+1)+'</i>'+c+'</li>'}).join('')+'</ol>'+
@@ -852,7 +887,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
     $('carry').innerHTML=ico('box')+(d.parts.length?d.parts.join(', ')+' 챙겨서 출발했어요':'점검 장비 챙겨서 출발했어요');
     $('ticket').innerHTML=
       '<div class="hd"><span>'+(d.urgent?'⚡ 긴급 출동 요청':'새 작업 요청')+'</span><small>1.8km · 14분</small></div><div class="bd">'+
-      '<div class="r"><span>위치</span><b>인천 부평구 ○○식당 주방</b></div>'+
+      '<div class="r"><span>위치</span><b>'+esc(fullAddr)+'</b></div>'+
       '<div class="r"><span>장비</span><b>'+CAT.equip[0]+'</b></div>'+
       '<div class="r"><span>에러코드</span><b class="o">'+(state.code&&CAT.code?CAT.code.c+' · '+CAT.code.m:'없음')+'</b></div>'+
       '<div class="r"><span>증상</span><b>'+d.picked.map(function(s){return s.t}).join(', ')+'</b></div>'+
@@ -865,7 +900,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
 
   var BAR={'1':['다음',function(){return state.label||!!state.img['1']&&!$('f1').classList.contains('scanning')}],
     '2':['다음',function(){return state.label}],'3':['다음',function(){return state.code!==null}],
-    '4':['요청 내용 확인하기',function(){return state.sym.size>0}],sum:['⚡ 기사님 부르기',function(){return true}]};
+    '4':['요청 내용 확인하기',function(){return state.sym.size>0&&document.getElementById('addrBiz').value.trim()&&document.getElementById('addrDong').value.trim()&&document.getElementById('addrDetail').value.trim()}],sum:['⚡ 기사님 부르기',function(){return true}]};
   var NEXT={'1':'2','2':'3','3':'4','4':'sum',sum:'match'};
   var TITLE={'1':'제품 사진','2':'라벨','3':'에러코드','4':'증상',sum:'요청 확인',match:'',done:''};
 
@@ -873,6 +908,18 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
     var b=BAR[cur];$('bar').style.display=b?'':'none';if(!b)return;
     $('cta').textContent=b[0];$('cta').disabled=busy===true||!b[1]();
   }
+  ['addrBiz','addrDong','addrDetail'].forEach(function(id){
+    document.getElementById(id).addEventListener('input',function(){updateBar()});
+  });
+  (function(){
+    var saved=loadStoreInfo();
+    if(saved&&(saved.biz||saved.dong||saved.detail)){
+      document.getElementById('addrBiz').value=saved.biz||'';
+      document.getElementById('addrDong').value=saved.dong||'';
+      document.getElementById('addrDetail').value=saved.detail||'';
+      $('addrSavedNote').hidden=false;
+    }
+  })();
   function go(id){
     $('s-'+cur).classList.remove('on');cur=id;$('s-'+id).classList.add('on');
     var step=['1','2','3','4'].indexOf(id);
