@@ -714,7 +714,7 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
     try{
       if(!window.speechSynthesis)return;
       var u=new SpeechSynthesisUtterance('찍꼬');
-      u.lang='ko-KR';u.rate=1;u.pitch=1;
+      u.lang='ko-KR';u.rate=1.4;u.pitch=1.8;
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
     }catch(e){}
