@@ -710,7 +710,7 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
     clearTimeout(waitTimer);if(st.online)waitTimer=setTimeout(openCall,4000);
   };
   $('testCall').onclick=function(){if(!st.online)$('onlineBtn').click();clearTimeout(waitTimer);openCall()};
-  function speakJikko(){
+  function speakJikkoFallback(){
     try{
       if(!window.speechSynthesis)return;
       var u=new SpeechSynthesisUtterance('찍꼬');
@@ -718,6 +718,19 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
     }catch(e){}
+  }
+  // 브라우저 기본 음성합성(speechSynthesis)은 기계음이라, 구글 번역의
+  // 음성 읽어주기 엔드포인트로 더 자연스러운 소리를 먼저 시도하고,
+  // 실패하면(네트워크 문제 등) speechSynthesis로 조용히 대체함 —
+  // 공식 API가 아니라 언제든 막힐 수 있어서 반드시 대체 경로를 둠.
+  var JIKKO_TTS_URL='https://translate.google.com/translate_tts?ie=UTF-8&tl=ko&client=tw-ob&q='+encodeURIComponent('찍꼬');
+  function speakJikko(){
+    try{
+      var a=new Audio(JIKKO_TTS_URL);
+      a.onerror=speakJikkoFallback;
+      var p=a.play();
+      if(p&&p.catch)p.catch(speakJikkoFallback);
+    }catch(e){speakJikkoFallback()}
   }
   function openCall(){
     if(cur!=='home'&&cur!=='board')return;
