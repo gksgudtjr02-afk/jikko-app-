@@ -845,25 +845,27 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
     $('chips').appendChild(b);
   });
 
-  function setShot(slot,html){
+  function setShot(slot,html,realPhotoDataUrl){
     var f=$('f'+slot);
     var old=f.querySelector('.shot');if(old)old.remove();
     f.querySelector('.ghost').style.display='none';
     f.insertAdjacentHTML('afterbegin',html);
     f.querySelector('.hint').style.display='none';
     state.img[slot]=html;
+    if(slot==='3')state.realCodePhoto=realPhotoDataUrl||null;
     f.classList.add('scanning');$('r'+slot).innerHTML='';updateBar(true);
     setTimeout(function(){
       f.classList.remove('scanning');
-      readShot(slot);
-      updateBar();
+      var p=readShot(slot);
+      if(p&&p.then)p.then(function(){updateBar()});
+      else updateBar();
     },slot==='1'?1000:1800);
   }
   document.querySelectorAll('[data-sample]').forEach(function(b){b.onclick=function(){setShot(b.dataset.sample,sampleFor(b.dataset.sample))}});
   document.querySelectorAll('input[type=file]').forEach(function(inp){
-    inp.onchange=function(){var file=inp.files&&inp.files[0];if(!file)return;var r=new FileReader();r.onload=function(){setShot(inp.dataset.slot,'<img class="shot" alt="찍은 사진" src="'+r.result+'">')};r.readAsDataURL(file);};
+    inp.onchange=function(){var file=inp.files&&inp.files[0];if(!file)return;var r=new FileReader();r.onload=function(){setShot(inp.dataset.slot,'<img class="shot" alt="찍은 사진" src="'+r.result+'">',inp.dataset.slot==='3'?r.result:null)};r.readAsDataURL(file);};
   });
-  $('skip3').onclick=function(){state.code=null;state.img['3']=null;go('4')};
+  $('skip3').onclick=function(){state.code=null;state.img['3']=null;state.realCodePhoto=null;go('4')};
 
   function diagnose(){
     var picked=SYMPTOMS.filter(function(s){return state.sym.has(s.k)});
@@ -1187,15 +1189,39 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
   CAT_ORDER.forEach(function(k){var c=CATS[k];var b=document.createElement('button');b.className='cat';b.innerHTML='<span class="ic">'+ico(c.ic)+'</span><b>'+c.n+'</b><small>'+c.d+'</small>';b.onclick=function(){setCat(k)};$('catgrid').appendChild(b)});
 
   function kv(rows){return '<div class="kv">'+rows.map(function(r){return '<span>'+r[0]+'</span><b>'+r[1]+'</b>'}).join('')+'</div>'}
+  async function diagnosePhoto(imageDataUrl,equipment){
+    try{
+      var res=await fetch('/api/diagnose-photo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageDataUrl:imageDataUrl,equipment:equipment})});
+      if(!res.ok)return null;
+      var data=await res.json();
+      return data.ok?data:null;
+    }catch(e){console.error('[jikko] diagnosePhoto 실패',e);return null}
+  }
+  function fallbackCode3(){
+    state.code=CAT.code?CAT.code.c:'ok';
+    $('r3').innerHTML='<div class="readout"><div class="readhead">'+ck+(CAT.code?'에러코드를 읽었어요':'확인했어요')+'</div>'+kv(CAT.code?[['코드',CAT.code.c],['의미',CAT.code.m]]:CAT.read3)+'</div>'+note;
+  }
   function readShot(slot){
     if(slot==='1'){$('r1').innerHTML='<div class="readout"><div class="readhead">'+ck+(CAT.kind==='eq'?'장비를 확인했어요':'문제 위치를 확인했어요')+'</div>'+kv(CAT.read1)+'</div>'+note}
     else if(slot==='2'){state.label=true;$('r2').innerHTML='<div class="readout"><div class="readhead">'+ck+(CAT.kind==='eq'?'라벨을 읽었어요':'가까이 분석했어요')+'</div>'+kv(CAT.label)+'</div>'+note}
-    else{state.code=CAT.code?CAT.code.c:'ok';$('r3').innerHTML='<div class="readout"><div class="readhead">'+ck+(CAT.code?'에러코드를 읽었어요':'확인했어요')+'</div>'+kv(CAT.code?[['코드',CAT.code.c],['의미',CAT.code.m]]:CAT.read3)+'</div>'+note}
+    else if(slot==='3'&&state.realCodePhoto){
+      state.code=null;
+      $('r3').innerHTML='<div class="readout"><div class="readhead">AI가 표시창을 읽는 중...</div></div>';
+      return diagnosePhoto(state.realCodePhoto,CAT.n).then(function(result){
+        if(result){
+          state.code=result.code||'ok';
+          $('r3').innerHTML='<div class="readout"><div class="readhead">'+ck+(result.code?'에러코드를 읽었어요':'에러 표시가 없어요')+'</div>'+kv(result.code?[['코드',result.code],['설명',result.note||'']]:[['확인',result.note||'표시창에 에러 표시가 없어요']])+'</div>';
+        }else{
+          fallbackCode3();
+        }
+      });
+    }
+    else{fallbackCode3()}
   }
   function sampleFor(slot){return CAT.sample[slot]}
   function setCat(k){
     CAT=CATS[k];SYMPTOMS=CAT.sym;
-    state.img={};state.label=false;state.code=null;state.sym=new Set();state.insHarm=null;$('memo').value='';
+    state.img={};state.label=false;state.code=null;state.realCodePhoto=null;state.sym=new Set();state.insHarm=null;$('memo').value='';
     ['1','2','3'].forEach(function(n,i){
       var sh=CAT.shots[i],f=$('f'+n);
       $('t'+n).textContent=sh[0];$('l'+n).textContent=sh[1];
