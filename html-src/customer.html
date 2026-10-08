@@ -820,6 +820,16 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
       return res.data;
     }catch(e){console.error('[jikko] createJob 실패',e);return null;}
   }
+  var realMatch=null;
+  function watchJobMatch(jobId){
+    if(!sb)return;
+    sb.channel('job-match-'+jobId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'jobs',filter:'id=eq.'+jobId},function(payload){
+      if(payload.new.status==='matched'){
+        realMatch={name:payload.new.technician_name||null};
+        if(cur==='match')go('done');
+      }
+    }).subscribe();
+  }
   var cur='home';
   var $=function(id){return document.getElementById(id)};
   var won=function(n){return n.toLocaleString('ko-KR')};
@@ -939,7 +949,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
     matchMsgs().forEach(function(m,i){
       setTimeout(function(){if(cur!=='match')return;var d=document.createElement('div');d.innerHTML=ico('check')+'<span>'+m+'</span>';f.appendChild(d)},1000*(i+1));
     });
-    setTimeout(function(){if(cur==='match')go('done')},4000);
+    setTimeout(function(){if(cur==='match'&&(!sb||realMatch))go('done')},4000);
   }
   $('startBtn').onclick=function(){go('1')};
   $('cta').onclick=function(){var n=NEXT[cur];if(n)go(n)};
@@ -1061,7 +1071,8 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
   }
   function applyTech(){
     var p=findPro(state.pref||CAT.pro);
-    $('dAv').innerHTML=p.av;$('rvAv').innerHTML=p.av;$('dName').textContent=p.name+' 기사님';$('rvName').textContent=p.name;
+    var realName=realMatch&&realMatch.name;
+    $('dAv').innerHTML=p.av;$('rvAv').innerHTML=p.av;$('dName').textContent=(realName||p.name)+' 기사님';$('rvName').textContent=realName||p.name;
     $('dMeta').textContent=p.eq.join('·')+' '+p.yrs+'년 · '+p.km+'km';$('dStar').textContent='★ '+p.star;$('dCnt').textContent='리뷰 '+p.cnt+'개';
     $('dPraise').innerHTML=Object.keys(p.tags).map(function(k){return '<span>'+k+'<b>'+p.tags[k]+'</b></span>'}).join('');
     $('dLast').textContent='“'+p.rv[0][2]+'” · '+p.rv[0][0]+' 사장님';
@@ -1361,7 +1372,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
     // 애니메이션으로 넘어가기 전에 실제 콜보드용 요청을 먼저 만들어둠.
     // createJob()은 Supabase 연동이 안 돼있어도 조용히 null을 반환할 뿐이라
     // 이 흐름 자체는 항상 그대로 진행됨.
-    'sum':function(){createJob().then(function(){go('match')})}
+    'sum':function(){createJob().then(function(row){if(row)watchJobMatch(row.id);go('match')})}
   };
   // sell bar when on sell tab
   var _ub=updateBar;updateBar=function(busy){_ub(busy);if(cur==='u-home'){var sell=!$('usell').hidden;$('bar').style.display=sell?'':'none';if(sell){$('cta').textContent=sellMode==='buy'?'찍꼬 매입 신청':'중고 장터에 올리기';$('cta').disabled=!sellShot}}};

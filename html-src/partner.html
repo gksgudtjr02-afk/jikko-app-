@@ -913,7 +913,7 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
   async function claimJob(jobId){
     if(!sb)return true; // 연동 전이면 데모처럼 항상 성공 처리
     try{
-      var res=await sb.from('jobs').update({status:'matched',technician_id:PARTNER_ID,matched_at:new Date().toISOString()}).eq('id',jobId).eq('status','new').select();
+      var res=await sb.from('jobs').update({status:'matched',technician_id:PARTNER_ID,technician_name:partnerName||'기사님',matched_at:new Date().toISOString()}).eq('id',jobId).eq('status','new').select();
       if(res.error)throw res.error;
       return !!(res.data&&res.data.length);
     }catch(e){console.error('[jikko] claimJob 실패',e);return false;}
