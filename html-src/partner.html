@@ -743,14 +743,26 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
   function tick(){$('tnum').textContent=left;$('tfg').style.strokeDashoffset=150.8*(1-left/30)}
   function closeCall(){clearInterval(callTimer);$('call').classList.remove('open');document.body.style.overflow=''}
   $('decline').onclick=function(){grabbing=null;closeCall();toast('거절했어요. 다음 호출을 기다릴게요')};
+  var goDistKm=null,goEtaMin=null;
+  function haversineKm(lat1,lng1,lat2,lng2){
+    var R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
+    var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+    return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+  }
   async function loadJobAddress(jobId,bizName){
     $('goBiz').textContent=(bizName||'사장님')+' 사장님';
+    goDistKm=null;goEtaMin=null;
     if(!sb){$('goAddr').textContent='인천 부평구 ○○로 12, 1층 주방';return}
     $('goAddr').textContent='주소 불러오는 중...';
     try{
-      var res=await sb.from('job_addresses').select('address').eq('job_id',jobId).maybeSingle();
+      var res=await sb.from('job_addresses').select('address,lat,lng').eq('job_id',jobId).maybeSingle();
       if(res.error)throw res.error;
       $('goAddr').textContent=(res.data&&res.data.address)||'주소 정보 없음';
+      if(res.data&&res.data.lat!=null&&myPos){
+        goDistKm=Math.round(haversineKm(myPos.lat,myPos.lng,res.data.lat,res.data.lng)*10)/10;
+        goEtaMin=Math.max(3,Math.round(goDistKm/20*60));
+        if(cur==='go'&&goStage===0)renderGo();
+      }
     }catch(e){console.error('[jikko] 주소 조회 실패',e);$('goAddr').textContent='주소를 불러오지 못했어요'}
   }
   $('accept').onclick=async function(){
@@ -768,6 +780,7 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
     }else if(grabbing){
       $('goBiz').textContent='○○식당 사장님';
       $('goAddr').textContent='인천 부평구 ○○로 12, 1층 주방';
+      goDistKm=null;goEtaMin=null;
       grabbing.status='matched';grabbing.me=true;grabbing=null;
     }
     closeCall();go('go');toast('배정 완료! 사장님께 출발 알림을 보냈어요');
@@ -777,7 +790,7 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
   var goStage=0;
   function renderGo(){
     var lis=$('goTl').querySelectorAll('li');lis.forEach(function(l,i){l.classList.toggle('done',i<=goStage)});
-    if(goStage===0){$('mapPill').innerHTML='도착까지 <b>14분</b> · 1.8km';FLOW.go.t='현장에 도착했어요'}
+    if(goStage===0){$('mapPill').innerHTML='도착까지 <b>'+(goEtaMin!=null?goEtaMin:14)+'분</b> · '+(goDistKm!=null?goDistKm:1.8)+'km';FLOW.go.t='현장에 도착했어요'}
     else if(goStage===1){$('mapPill').innerHTML='<b>현장 도착</b> · 사장님께 알림 보냄';FLOW.go.t='수리 시작'}
     else if(goStage===2){$('mapPill').innerHTML='<b>수리 중</b>';FLOW.go.t='작업 완료 · 금액 입력'}
     else{go('done');return}
@@ -867,6 +880,26 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
     }
   }catch(e){}
 
+  var myPos=null;
+  function requestMyLocation(){
+    if(!navigator.geolocation)return;
+    navigator.geolocation.getCurrentPosition(function(pos){
+      myPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      calls.filter(function(c){return c.real&&c.status==='new'}).forEach(fetchJobDistance);
+    },function(e){console.error('[jikko] 위치 조회 실패',e)},{enableHighAccuracy:false,timeout:8000,maximumAge:300000});
+  }
+  async function fetchJobDistance(call){
+    if(!sb||!myPos||!call.realJobId)return;
+    try{
+      var res=await fetch('/api/job-distance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jobId:call.realJobId,lat:myPos.lat,lng:myPos.lng})});
+      if(!res.ok)return;
+      var data=await res.json();
+      if(data.ok&&data.km!=null){
+        call.t.km=data.km;
+        if(cur==='board')renderBoard();
+      }
+    }catch(e){console.error('[jikko] fetchJobDistance 실패',e)}
+  }
   function jobToCall(row){
     return {
       id:++seq,real:true,realJobId:row.id,
@@ -875,7 +908,7 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
       me:row.technician_id===PARTNER_ID,
       by:(row.technician_id&&row.technician_id!==PARTNER_ID)?'다른 기사님':undefined,
       took:'',
-      t:{eq:row.equipment,sym:row.symptom+(row.error_code?' · '+row.error_code:''),dong:row.dong||'동네 미입력',biz:row.business||'',km:0,earn:[row.price_low,row.price_high],u:!!row.urgent}
+      t:{eq:row.equipment,sym:row.symptom+(row.error_code?' · '+row.error_code:''),dong:row.dong||'동네 미입력',biz:row.business||'',km:null,earn:[row.price_low,row.price_high],u:!!row.urgent}
     };
   }
   async function loadRealJobs(){
@@ -885,7 +918,9 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
       if(res.error)throw res.error;
       (res.data||[]).forEach(function(row){
         if(calls.some(function(c){return c.realJobId===row.id}))return;
-        calls.unshift(jobToCall(row));
+        var call=jobToCall(row);
+        calls.unshift(call);
+        fetchJobDistance(call);
       });
       renderBoard();
     }catch(e){console.error('[jikko] loadRealJobs 실패',e);}
@@ -895,7 +930,9 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
     sb.channel('jobs-board').on('postgres_changes',{event:'INSERT',schema:'public',table:'jobs'},function(payload){
       if(payload.new.status!=='new')return;
       if(calls.some(function(c){return c.realJobId===payload.new.id}))return;
-      calls.unshift(jobToCall(payload.new));
+      var newCall=jobToCall(payload.new);
+      calls.unshift(newCall);
+      fetchJobDistance(newCall);
       if(cur==='board')renderBoard();
       toast('새 호출이 들어왔어요');
       speakJikko();
@@ -930,6 +967,7 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
     }catch(e){console.error('[jikko] 파트너 이름 조회 실패',e)}
   }
   loadPartnerName();
+  requestMyLocation();
   function mk(left,status){var t=TPL[seq%TPL.length];seq++;return {id:seq,t:t,left:left,status:status||'new',watch:1+Math.floor(Math.random()*4),age:0,bonus:false}}
   function initBoard(){
     calls=[mk(262),mk(155)];
@@ -948,14 +986,15 @@ h2{font-size:24px;line-height:1.3;font-weight:700;margin:6px 0 4px;letter-spacin
     if(btab==='new')list.sort(function(a,b){return a.left-b.left});
     $('clist').innerHTML=list.length?list.map(card).join(''):'<p class="boardnote" style="padding:30px 0">'+(btab==='new'?'지금은 대기 중인 호출이 없어요.<br>새 호출이 오면 바로 여기에 떠요.':'아직 없어요.')+'</p>';
   }
+  function kmText(km){return km!=null?km+'km':'거리 확인 중'}
   function card(x){
     var t=x.t,h='';
     if(x.status==='new'){
       h='<div class="cc new"><div class="r1"><span>'+(t.u?'<span class="pill u">⚡ 긴급</span> ':'')+'<span class="pill n">신규 호출</span>'+(x.bonus?' <span class="pill b">보너스 +5,000원</span>':'')+'</span><span class="tm'+(x.left<60?' low':'')+'">'+mmss(x.left)+'</span></div>'+
-        '<h4>'+t.eq+(t.biz?' · '+t.biz:'')+'</h4><div class="meta">'+t.sym+' · '+t.dong+' '+t.km+'km</div>'+
+        '<h4>'+t.eq+(t.biz?' · '+t.biz:'')+'</h4><div class="meta">'+t.sym+' · '+t.dong+' '+kmText(t.km)+'</div>'+
         '<div class="r3"><span class="earnv">예상 '+man(t.earn[0])+'~'+man(t.earn[1])+'원<small class="watch">기사님 '+x.watch+'명이 보고 있어요</small></span><button class="grab" data-grab="'+x.id+'">잡기</button></div></div>';
     }else if(x.status==='matched'){
-      h='<div class="cc'+(x.me?' mine':'')+'"><div class="r1"><span class="pill '+(x.me?'me':'m')+'">'+(x.me?'내가 잡은 콜':'매칭 완료')+'</span><span class="meta">'+t.dong+' '+t.km+'km</span></div><h4>'+t.eq+'</h4><div class="meta">'+t.sym+'</div><div class="who">'+(x.me?'지금 출동 중이에요':x.by+' 기사님이 '+x.took+' 만에 잡았어요')+'</div></div>';
+      h='<div class="cc'+(x.me?' mine':'')+'"><div class="r1"><span class="pill '+(x.me?'me':'m')+'">'+(x.me?'내가 잡은 콜':'매칭 완료')+'</span><span class="meta">'+t.dong+' '+kmText(t.km)+'</span></div><h4>'+t.eq+'</h4><div class="meta">'+t.sym+'</div><div class="who">'+(x.me?'지금 출동 중이에요':x.by+' 기사님이 '+x.took+' 만에 잡았어요')+'</div></div>';
     }else{
       h='<div class="cc'+(x.me?' mine':'')+'"><div class="r1"><span class="pill '+(x.me?'me':'d')+'">'+(x.me?'내 완료':'수리 완료')+'</span><span class="meta">'+t.dong+'</span></div><h4>'+t.eq+'</h4><div class="who">'+x.by+' 기사님 · 정산 대기</div></div>';
     }

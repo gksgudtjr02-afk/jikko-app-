@@ -786,6 +786,14 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
     var SB_URL='__SUPABASE_URL__',SB_KEY='__SUPABASE_ANON_KEY__';
     if(window.supabase&&SB_URL.indexOf('__')!==0)sb=window.supabase.createClient(SB_URL,SB_KEY);
   }catch(e){}
+  async function geocodeAddress(address){
+    try{
+      var res=await fetch('/api/geocode',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({address:address})});
+      if(!res.ok)return null;
+      var data=await res.json();
+      return(data.ok&&data.lat!=null)?{lat:data.lat,lng:data.lng}:null;
+    }catch(e){console.error('[jikko] geocodeAddress 실패',e);return null}
+  }
   var STORE_INFO_KEY='jikko_store_info';
   function loadStoreInfo(){
     try{return JSON.parse(localStorage.getItem(STORE_INFO_KEY)||'null')}catch(e){return null}
@@ -813,7 +821,9 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
       if(res.error)throw res.error;
       state.jobId=res.data.id;
       if(detail){
-        var addrRes=await sb.from('job_addresses').insert({job_id:res.data.id,address:'인천 부평구 '+(dong?dong+' ':'')+detail});
+        var fullAddr='인천 부평구 '+(dong?dong+' ':'')+detail;
+        var coords=await geocodeAddress(fullAddr);
+        var addrRes=await sb.from('job_addresses').insert({job_id:res.data.id,address:fullAddr,lat:coords?coords.lat:null,lng:coords?coords.lng:null});
         if(addrRes.error)console.error('[jikko] job_addresses 저장 실패',addrRes.error);
       }
       saveStoreInfo({biz:biz,dong:dong,detail:detail});
