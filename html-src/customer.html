@@ -439,6 +439,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
   <symbol id="i-shutter" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1.5"/><path d="M3 8h18M3 12h18M3 16h18"/></symbol>
   <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 9h12a3 3 0 1 0-3-3M3 15h15a3 3 0 1 1-3 3M3 12h9"/></symbol>
   <symbol id="i-ice" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="8.5" y="13" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 9h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c0 1-1 1-1 2s1 1 1 2M13 3.5c0 1-1 1-1 2s1 1 1 2"/></symbol>
   <symbol id="i-fan" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.3"/><path d="M12 10.7c0-3 .8-5 3.2-5.6M13.3 12c3 0 5 .8 5.6 3.2M12 13.3c0 3-.8 5-3.2 5.6M10.7 12c-3 0-5-.8-5.6-3.2"/></symbol>
   <symbol id="i-toilet" viewBox="0 0 24 24"><path d="M6 3h6v7H6z"/><path d="M4 10h16a7 7 0 0 1-7 7h-1l.6 4H8.4l.9-4.6A7 7 0 0 1 4 10z"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
@@ -1115,6 +1116,28 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
       read1:[['장비 종류','업소용 냉장고 (양문형)']],label:[['제조사','LG전자'],['모델명','C1100'],['냉매','R-134a'],['제조일','2021년 4월']],
       code:{c:'E1',m:'냉장실 온도 센서 이상',cause:'온도 센서 이상 (E1 코드)',part:'온도 센서',cost:[40000,90000]},equip:['LG 업소용 냉장고 C1100','2021년식 · R-134a'],
       sample:SAMPLE_FRIDGE,sym:SYMPTOMS},
+    ice:{n:'제빙기',d:'얼음 안 나옴·물 샘',ic:'ice',g:['ice','doc','thermo'],kind:'eq',pro:'park',proLabel:'제빙기',urg:'영업 중 얼음 품절',
+      shots:EQ_SHOTS('제빙기','보통 제빙기 옆면이나 뒷면 라벨에 붙어 있어요.','표시창에 에러코드가 보이면 찍어주세요.'),
+      read1:[['장비 종류','업소용 제빙기']],label:[['제조사','우성'],['모델명','SD-270'],['냉매','R-404a'],['제조일','2020년 6월']],
+      code:{c:'E3',m:'급수 수위 센서 이상',cause:'급수 수위 센서 이상 (E3 코드)',part:'수위 센서',cost:[40000,100000]},equip:['우성 제빙기 SD-270','2020년식 · R-404a'],
+      sample:{1:svgScene('#3A3530','<rect x="110" y="40" width="180" height="220" rx="10" fill="#E8E8E4"/><rect x="140" y="70" width="120" height="70" rx="6" fill="#BFE3F2"/><g fill="#BFE3F2"><rect x="150" y="160" width="26" height="26" rx="4"/><rect x="186" y="160" width="26" height="26" rx="4"/><rect x="222" y="160" width="26" height="26" rx="4"/></g>'),2:svgScene('#C9CDD2',lbl(['MODEL  SD-270','REFR   R-404a','MFD    2020.06','220V 60Hz'],'우성제빙기','#1E7AA0')),3:svgScene('#B3B8BE',disp('E3'))},
+      sym:[{k:'noice',i:'ice',t:'얼음이 안 나와요',causes:['제빙 모터 고장','냉매 부족'],parts:['제빙 모터'],cost:[80000,250000],urgent:true},
+           {k:'small',i:'ice',t:'얼음이 너무 작거나 안 얼어요',causes:['냉매 부족','온도 센서 이상'],parts:['온도 센서'],cost:[60000,180000]},
+           {k:'leak',i:'drop',t:'제빙기 밑으로 물이 새요',causes:['배수 호스 막힘','급수 밸브 누수'],parts:['급수 밸브'],cost:[40000,120000],urgent:true},
+           {k:'noise',i:'sound',t:'소리가 크고 진동이 심해요',causes:['컴프레서 노후','수평 안 맞음'],parts:[],cost:[50000,150000]},
+           {k:'nowater',i:'drop',t:'물이 안 들어가요',causes:['급수 밸브 막힘','수위 센서 이상'],parts:['급수 밸브'],cost:[40000,100000],urgent:true},
+           {k:'etc',i:'help',t:'잘 모르겠어요',causes:['현장 점검 필요'],parts:[],cost:[0,50000]}]},
+    coffee:{n:'커피머신',d:'에스프레소·그라인더 고장',ic:'coffee',g:['coffee','doc','thermo'],kind:'eq',pro:'choi',proLabel:'커피머신',urg:'영업 중 커피 못 뽑음',
+      shots:EQ_SHOTS('커피머신','보통 머신 아래쪽이나 뒷면에 붙어 있어요.','머신 화면에 에러코드나 경고등이 보이면 찍어주세요.'),
+      read1:[['장비 종류','반자동 에스프레소 머신']],label:[['제조사','라심발리'],['모델명','S20'],['전원','220V'],['제조일','2021년 2월']],
+      code:{c:'E05',m:'보일러 압력 센서 이상',cause:'보일러 압력 센서 이상 (E05 코드)',part:'압력 센서',cost:[70000,180000]},equip:['라심발리 에스프레소 머신 S20','2021년식 · 220V'],
+      sample:{1:svgScene('#2A2622','<rect x="100" y="40" width="200" height="130" rx="10" fill="#4A3B2C"/><rect x="130" y="170" width="140" height="90" rx="8" fill="#6B5A46"/><circle cx="160" cy="215" r="14" fill="#2A2622"/><circle cx="240" cy="215" r="14" fill="#2A2622"/>'),2:svgScene('#C9CDD2',lbl(['MODEL  S20','POWER  220V','MFD    2021.02','1-GROUP'],'라심발리','#6B3A1E')),3:svgScene('#B3B8BE',disp('E05'))},
+      sym:[{k:'nopower',i:'power',t:'전원이 아예 안 들어와요',causes:['히터 퓨즈 단선','전원 케이블 불량'],parts:['히터 퓨즈'],cost:[60000,150000],urgent:true},
+           {k:'nopressure',i:'thermo',t:'압력이 안 올라가요',causes:['보일러 히터 고장','압력 스위치 이상'],parts:['보일러 히터'],cost:[100000,300000],urgent:true},
+           {k:'leak',i:'drop',t:'물이 새요',causes:['개스킷 마모','밸브 노후'],parts:['개스킷'],cost:[40000,120000]},
+           {k:'grind',i:'help',t:'그라인더가 안 갈려요',causes:['그라인더 모터 고장','원두 걸림'],parts:['그라인더 모터'],cost:[80000,250000],urgent:true},
+           {k:'taste',i:'thermo',t:'맛이 이상해요(온도 문제)',causes:['보일러 온도 센서 이상','스케일(석회질) 과다'],parts:['온도 센서'],cost:[50000,150000]},
+           {k:'etc',i:'help',t:'잘 모르겠어요',causes:['현장 점검 필요'],parts:[],cost:[0,50000]}]},
     boiler:{n:'보일러·온수기',d:'온수·난방 고장',ic:'flame',g:['flame','doc','thermo'],kind:'eq',pro:'oh',proLabel:'보일러',urg:'영업 중 온수 끊김',
       shots:EQ_SHOTS('보일러','보일러 앞면 아래쪽이나 옆면에 붙어 있어요.','보일러나 실내 온도조절기 화면에 숫자 코드가 보이면 찍어주세요.'),
       read1:[['장비 종류','가스 보일러 (벽걸이형)']],label:[['제조사','경동나비엔'],['모델명','NCB553-20K'],['연료','LNG'],['제조일','2019년 11월']],
@@ -1195,7 +1218,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
            {k:'glass',i:'door',t:'유리문이 안 닫혀요',causes:['도어 클로저(힌지) 고장'],parts:['플로어 힌지'],cost:[80000,250000]}]}
   };
   var CAT=CATS.fridge;
-  var CAT_ORDER=['fridge','vent','toilet','drain','leak','boiler','sign','elec','shutter'];
+  var CAT_ORDER=['fridge','ice','coffee','vent','toilet','drain','leak','boiler','sign','elec','shutter'];
   CAT_ORDER.forEach(function(k){var c=CATS[k];var b=document.createElement('button');b.className='cat';b.innerHTML='<span class="ic">'+ico(c.ic)+'</span><b>'+c.n+'</b><small>'+c.d+'</small>';b.onclick=function(){setCat(k)};$('catgrid').appendChild(b)});
 
   function kv(rows){return '<div class="kv">'+rows.map(function(r){return '<span>'+r[0]+'</span><b>'+r[1]+'</b>'}).join('')+'</div>'}
