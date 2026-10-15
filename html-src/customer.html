@@ -1371,16 +1371,20 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
   function uRender(){$('ugrid').innerHTML=UI.filter(function(it){return uf==='전체'||it.c===uf}).map(function(it){return '<button class="uc" data-u="'+it.id+'"><div class="im">'+uImg(it)+'<span class="gr">'+it.g+'급</span></div><div class="bd2"><b>'+it.n+'</b><div class="pr">'+won(it.p)+'원</div><small>'+it.y+' · '+it.a+'</small>'+(it.ck?'<div class="ok">✓ 찍꼬 점검</div>':'')+'</div></button>'}).join('')}
   uRender();
   $('ugrid').addEventListener('click',function(e){var b=e.target.closest('[data-u]');if(!b)return;uDetail(+b.dataset.u)});
-  var curItem=null;
-  function uDetail(id){var it=UI.filter(function(x){return x.id===id})[0];curItem=it;
+  var curItem=null,moveWithBuy=false;
+  function uDetail(id){var it=UI.filter(function(x){return x.id===id})[0];curItem=it;moveWithBuy=false;
     $('uitem').innerHTML='<div class="uhero" style="background:linear-gradient(135deg,'+it.c1+',#2A2E33)">'+uImg(it).replace('<svg viewBox','<svg style="width:100%;height:100%;border-radius:22px" viewBox')+'</div>'+
       '<h2 style="margin-top:0">'+it.n+'</h2><div style="color:var(--muted);font-size:14px">'+it.y+' · '+it.a+' · '+it.f+'</div>'+
       '<div class="price" style="font-family:Outfit,sans-serif;font-weight:800;font-size:30px;margin:8px 0 4px">'+won(it.p)+'<span style="font-size:16px;font-family:IBM Plex Sans KR">원</span></div>'+
       (it.ck?'<div class="card"><div class="lab">찍꼬 기사님 점검 리포트</div><div class="mrow"><span>작동 테스트</span><b style="color:var(--ok)">정상</b></div><div class="mrow"><span>소음·진동</span><b style="color:var(--ok)">정상</b></div><div class="mrow"><span>외관</span><b>'+it.g+'급'+(it.g!=='A'?' (모서리 찍힘)':'')+'</b></div><div class="mrow"><span>소모품</span><b>패킹 교체 완료</b></div><div class="mrow"><span>보증</span><b>구매 후 3개월</b></div></div>'
         :'<div class="card"><div class="lab">점검 전 장비</div><span style="font-size:14.5px">판매자가 직접 올린 장비예요. 3만 원에 찍꼬 기사님 점검을 먼저 받아볼 수 있어요.</span></div>')+
-      '<button class="linkcard" id="uMove"><svg class="i"><use href="#i-box"/></svg><span><b>운반·설치까지 같이 신청하기</b><br>구매한 장비를 매장까지 옮기고 설치해드려요.</span></button>';
-    $('uMove').onclick=function(){mPrefill(it);go('m-form')};
+      '<div id="uMoveWrap"></div>';
+    renderUMove();
     go('u-item');}
+  function renderUMove(){
+    $('uMoveWrap').innerHTML='<button class="linkcard" id="uMove" aria-pressed="'+moveWithBuy+'"><svg class="i"><use href="#i-box"/></svg><span><b>'+(moveWithBuy?'✓ 운반·설치 같이 신청함':'운반·설치까지 같이 신청하기')+'</b><br>'+(moveWithBuy?'구매할 때 같이 신청돼요. 다시 누르면 빠져요.':'구매한 장비를 매장까지 옮기고 설치해드려요.')+'</span></button>';
+    $('uMove').onclick=function(){moveWithBuy=!moveWithBuy;renderUMove()};
+  }
   BAR['u-item']=['구매하기',function(){return true}];
   segInit('utab',function(b){var buy=b.dataset.t==='buy';$('ubuy').hidden=!buy;$('usell').hidden=buy;if(!buy)uSellRender()});
   var sellShot=false,sellMode='self';
@@ -1424,7 +1428,9 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
   BAR['x-ok']=['홈으로',function(){return true}];NEXT['x-ok']='home';
   BAR['u-home']=null;
   var XACT={
-    'u-item':function(){var it=curItem;xOk('구매 신청이 됐어요','판매자가 확인하면 알려드려요. 결제 금액은 찍꼬가 보관하다가 장비를 받고 확인하면 판매자에게 전달돼요.','<div class="card"><div class="mrow"><span>장비</span><b>'+it.n+'</b></div><div class="mrow"><span>금액</span><b>'+won(it.p)+'원</b></div><div class="mrow"><span>보증</span><b>'+(it.ck?'3개월':'점검 후 결정')+'</b></div></div>')},
+    'u-item':function(){var it=curItem,moveCard='';
+      if(moveWithBuy){mPrefill(it);var c=mCalc();moveCard='<div class="card"><div class="lab">운반·설치</div><div class="mrow"><span>차량</span><b>'+c.veh[0]+'</b></div><div class="mrow"><span>설치</span><b>포함</b></div><div class="mrow"><span>예상 비용</span><b>'+won(c.tot)+'원~</b></div></div>'}
+      xOk('구매 신청이 됐어요'+(moveWithBuy?' · 운반·설치도 같이 신청됐어요':''),'판매자가 확인하면 알려드려요. 결제 금액은 찍꼬가 보관하다가 장비를 받고 확인하면 판매자에게 전달돼요.','<div class="card"><div class="mrow"><span>장비</span><b>'+it.n+'</b></div><div class="mrow"><span>금액</span><b>'+won(it.p)+'원</b></div><div class="mrow"><span>보증</span><b>'+(it.ck?'3개월':'점검 후 결정')+'</b></div></div>'+moveCard)},
     'u-home':function(){xOk(sellMode==='buy'?'매입 신청이 됐어요':'판매 등록이 됐어요',sellMode==='buy'?'찍꼬 기사님이 방문해서 상태를 확인하고, 수거 당일 입금해드려요.':'중고 장터에 올라갔어요. 구매 문의가 오면 알려드려요.')},
     'm-form':function(){var c=mCalc();xOk('운반 기사님이 배정됐어요','최강운 기사님이 '+segVal('mdate')+' 출발 전에 연락드릴 거예요.','<div class="card"><div class="mrow"><span>차량</span><b>'+c.veh[0]+'</b></div><div class="mrow"><span>장비</span><b>'+c.n+'대'+(c.inst?' · 설치 포함':'')+'</b></div><div class="mrow"><span>예상 비용</span><b>'+won(c.tot)+'원~</b></div><div class="mrow"><span>기사님</span><b>최강운 · ★4.9 · 운반 412건</b></div></div><div class="card"><div class="lab">안심 운반</div><span style="font-size:14.5px">운반 중 파손은 화물 배상보험으로 보상돼요. 설치까지 신청하셨으면 작동 확인 후 완료 처리해요.</span></div>')},
     // 수리 요청 확인 화면에서 "기사님 부르기"를 누르면, 데모 매칭
