@@ -1218,7 +1218,7 @@ textarea{width:100%;margin-top:14px;min-height:88px;border-radius:18px;border:1.
            {k:'glass',i:'door',t:'유리문이 안 닫혀요',causes:['도어 클로저(힌지) 고장'],parts:['플로어 힌지'],cost:[80000,250000]}]}
   };
   var CAT=CATS.fridge;
-  var CAT_ORDER=['fridge','ice','coffee','vent','toilet','drain','leak','boiler','sign','elec','shutter'];
+  var CAT_ORDER=['fridge','ice','coffee','vent','toilet','drain','leak','boiler','sign','elec'];
   CAT_ORDER.forEach(function(k){var c=CATS[k];var b=document.createElement('button');b.className='cat';b.innerHTML='<span class="ic">'+ico(c.ic)+'</span><b>'+c.n+'</b><small>'+c.d+'</small>';b.onclick=function(){setCat(k)};$('catgrid').appendChild(b)});
 
   function kv(rows){return '<div class="kv">'+rows.map(function(r){return '<span>'+r[0]+'</span><b>'+r[1]+'</b>'}).join('')+'</div>'}
